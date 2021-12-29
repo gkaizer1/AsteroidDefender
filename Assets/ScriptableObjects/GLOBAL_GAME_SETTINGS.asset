@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 847b96ecc3b8bd249a94d81a56f1d85c, type: 3}
+  m_Name: GLOBAL_GAME_SETTINGS
+  m_EditorClassIdentifier: 
+  unlockedTilePrefab: {fileID: 7070955671779363895, guid: 9596f58d7082d724fa7ba0c0d488930e, type: 3}
+  EmptySatellitePrefab: {fileID: 4950768095048093555, guid: 283a797a09d7af44baede18b59f6c970, type: 3}
+  levelTiles:
+  - name: LEVEL 2
+    level: 2
+    TileManagerName: NORTH_AMERICA
+    row: 1
+    column: 2
+  - name: LEVEL 3
+    level: 3
+    TileManagerName: NORTH_AMERICA
+    row: 1
+    column: 3
+  - name: LEVEL 3
+    level: 3
+    TileManagerName: NORTH_AMERICA
+    row: 0
+    column: 2
+  - name: LEVEL 5
+    level: 5
+    TileManagerName: NORTH_AMERICA
+    row: 1
+    column: 1

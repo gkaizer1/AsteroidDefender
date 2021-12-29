@@ -1,0 +1,219 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a151aae416b497c9eaea8aa5ac1c555, type: 3}
+  m_Name: Theme_MainUI_Theme
+  m_EditorClassIdentifier: 
+  m_themeName: MainUI_Theme
+  SerializedGuid: 26ff33ca6b0a4048a9f5ced8589c45b5
+  m_activeVariant:
+    m_variantName: Default
+    SerializedGuid: acf40d85e8b16349a2f60301bf23df11
+    Colors:
+    - m_color: {r: 1, g: 1, b: 1, a: 1}
+      SerializedGuid: 05f3d06d2cdbed4fa0800341476a137e
+    - m_color: {r: 1, g: 1, b: 1, a: 1}
+      SerializedGuid: b21968b6baf99843a44a8351a3df347f
+    - m_color: {r: 1, g: 1, b: 1, a: 1}
+      SerializedGuid: 5064711722e7bf48b81ea0ad3af23a50
+    - m_color: {r: 1, g: 1, b: 1, a: 1}
+      SerializedGuid: 14f3f2a93975da45aae01c93929ff075
+    - m_color: {r: 1, g: 1, b: 1, a: 1}
+      SerializedGuid: 191cbae9effd3b41bec63718273f688e
+    - m_color: {r: 1, g: 1, b: 1, a: 1}
+      SerializedGuid: b7e1ae274c07e34cbfb99c3370f290e5
+    - m_color: {r: 1, g: 0.80982494, b: 0, a: 1}
+      SerializedGuid: 651a3be7b55d4745a15c3becc52c5ac2
+    Sprites:
+    - m_sprite: {fileID: 21300000, guid: aed564b79c47225498d99fc48abad3d2, type: 3}
+      SerializedGuid: 0834282f574f1649bfaff15b6a78d2d3
+    - m_sprite: {fileID: 21300000, guid: f960256e3f405ca4a8ffe2707945fec7, type: 3}
+      SerializedGuid: e02216a4f45d6144a15bd115e078e6cd
+    - m_sprite: {fileID: 21300000, guid: 98e9493cfc0a6a1418ee6581694534f2, type: 3}
+      SerializedGuid: b5a0b3178874c944b5591ace40664b7c
+    - m_sprite: {fileID: 21300000, guid: aed564b79c47225498d99fc48abad3d2, type: 3}
+      SerializedGuid: eb292618157cf3438ab8d9b6ed860661
+    - m_sprite: {fileID: 21300000, guid: a50e72b59b2889e438af4c01bed12c20, type: 3}
+      SerializedGuid: f9f511be53693348888fc0769fa68129
+    - m_sprite: {fileID: 21300000, guid: fb780a97c453f4e4e8da404bc38424a6, type: 3}
+      SerializedGuid: 1ed50d7bbc0a724e81a0199a33f3f29d
+    - m_sprite: {fileID: 21300000, guid: b7f3cecf69a53e948b3aa9b5a9672913, type: 3}
+      SerializedGuid: 5740706a36c0a543b721a5a25aa34bcd
+    - m_sprite: {fileID: 21300000, guid: 87ee07807ce78524db83d6de90a8b75d, type: 3}
+      SerializedGuid: d6bc2549b7ab144abac1a3c38dd56297
+    - m_sprite: {fileID: 21300000, guid: 60aba7a14352f4e4e883a054df835215, type: 3}
+      SerializedGuid: e2e70ab564c43f4fb8cc38b6b6a7869b
+    - m_sprite: {fileID: 21300000, guid: b2ece19974cf77a4184b82b3b67f52d4, type: 3}
+      SerializedGuid: f895a1a1d9de76488aa3b01da2cfbd04
+    - m_sprite: {fileID: 21300000, guid: 87457dc1458dbbb4b97cb314f77f9214, type: 3}
+      SerializedGuid: a0330f4d5fe8884aa138c4174e5f830d
+    - m_sprite: {fileID: 21300000, guid: e600ce1fbe28d6f4fb6aa70f6783c749, type: 3}
+      SerializedGuid: 430b1dbfa6d5ab41b4919dcb935142fb
+    - m_sprite: {fileID: 21300000, guid: 7b2e22d695c6df248be4eac616154624, type: 3}
+      SerializedGuid: 96fdaaf56e8c224dbca282bb09cbbc6b
+    - m_sprite: {fileID: 21300000, guid: e2f0282d6bd25084ab16e2d2aeee4c9a, type: 3}
+      SerializedGuid: 4d3798c2c0df1f46be6e98998c8f7a33
+    - m_sprite: {fileID: 21300000, guid: 5fd3f14774c9e0f4580413f905f1b58b, type: 3}
+      SerializedGuid: 24f9885871dbf3418bd5cecd30e89393
+    - m_sprite: {fileID: 21300000, guid: b3269eef2ca137641a9497feb8d171d9, type: 3}
+      SerializedGuid: d0c7d08f6e83fa44b3187ece7f733efb
+    - m_sprite: {fileID: 21300000, guid: b3269eef2ca137641a9497feb8d171d9, type: 3}
+      SerializedGuid: 16f2a9c179d17f43a966a8c2ec79ca1d
+    - m_sprite: {fileID: 21300000, guid: e5d59660f8fa9864d81bf5c5dfd867e1, type: 3}
+      SerializedGuid: 1e0e0226910f5c40aae77c2dddae6002
+    - m_sprite: {fileID: 21300000, guid: b3ba5547182e4a84798a6ca575e9bdfa, type: 3}
+      SerializedGuid: 9cc8ee63f00431439e6023706faaa0e7
+    - m_sprite: {fileID: 21300000, guid: 7a9982f643a8e0a42aae73efcb07d32c, type: 3}
+      SerializedGuid: af5f16f4af77a945ab1ffd866f792d58
+    - m_sprite: {fileID: 21300000, guid: 4bc27dfb76c2b1d49828c0822b0e297c, type: 3}
+      SerializedGuid: 36663e2487c5ff4b83508db2b27512ee
+    - m_sprite: {fileID: 21300000, guid: 3138436c6256ce14a9f8af4e59a644ea, type: 3}
+      SerializedGuid: 03083c2d62673d429c6a592c816b658a
+    - m_sprite: {fileID: 21300000, guid: cdf5cb4512990554b9579cd1b596bfce, type: 3}
+      SerializedGuid: 608707b22a36f140ab2d29eabef56312
+    Textures: []
+    Fonts: []
+    FontAssets: []
+  ColorLabels:
+  - m_label: Primary
+    SerializedGuid: 05f3d06d2cdbed4fa0800341476a137e
+  - m_label: Secondary
+    SerializedGuid: b21968b6baf99843a44a8351a3df347f
+  - m_label: Accent 1
+    SerializedGuid: 5064711722e7bf48b81ea0ad3af23a50
+  - m_label: Accent 2
+    SerializedGuid: 14f3f2a93975da45aae01c93929ff075
+  - m_label: Text
+    SerializedGuid: 191cbae9effd3b41bec63718273f688e
+  - m_label: Disabled
+    SerializedGuid: b7e1ae274c07e34cbfb99c3370f290e5
+  - m_label: MainMenuText
+    SerializedGuid: 651a3be7b55d4745a15c3becc52c5ac2
+  SpriteLabels:
+  - m_label: ButtonUp
+    SerializedGuid: 0834282f574f1649bfaff15b6a78d2d3
+  - m_label: ButtonOver
+    SerializedGuid: e02216a4f45d6144a15bd115e078e6cd
+  - m_label: ButtonPressed
+    SerializedGuid: b5a0b3178874c944b5591ace40664b7c
+  - m_label: ButtonDisabled
+    SerializedGuid: eb292618157cf3438ab8d9b6ed860661
+  - m_label: PopupBackground
+    SerializedGuid: f9f511be53693348888fc0769fa68129
+  - m_label: StatuePanel
+    SerializedGuid: 1ed50d7bbc0a724e81a0199a33f3f29d
+  - m_label: MapBackground
+    SerializedGuid: 5740706a36c0a543b721a5a25aa34bcd
+  - m_label: SelectionBackground
+    SerializedGuid: d6bc2549b7ab144abac1a3c38dd56297
+  - m_label: ResourceBarBackground
+    SerializedGuid: e2e70ab564c43f4fb8cc38b6b6a7869b
+  - m_label: TimeControlBackground
+    SerializedGuid: f895a1a1d9de76488aa3b01da2cfbd04
+  - m_label: ButtonPause
+    SerializedGuid: a0330f4d5fe8884aa138c4174e5f830d
+  - m_label: ButtonPauseOver
+    SerializedGuid: 430b1dbfa6d5ab41b4919dcb935142fb
+  - m_label: ButtonPlay
+    SerializedGuid: 96fdaaf56e8c224dbca282bb09cbbc6b
+  - m_label: ButtonPlayOver
+    SerializedGuid: 4d3798c2c0df1f46be6e98998c8f7a33
+  - m_label: TargetIcon
+    SerializedGuid: 24f9885871dbf3418bd5cecd30e89393
+  - m_label: ButtonFastForward
+    SerializedGuid: d0c7d08f6e83fa44b3187ece7f733efb
+  - m_label: ButtonFastForwardOver
+    SerializedGuid: 16f2a9c179d17f43a966a8c2ec79ca1d
+  - m_label: VerticalDivider
+    SerializedGuid: 1e0e0226910f5c40aae77c2dddae6002
+  - m_label: PopupCloseButtonUp
+    SerializedGuid: 9cc8ee63f00431439e6023706faaa0e7
+  - m_label: PopupCoseButtonOver
+    SerializedGuid: af5f16f4af77a945ab1ffd866f792d58
+  - m_label: SquareButtonUp
+    SerializedGuid: 36663e2487c5ff4b83508db2b27512ee
+  - m_label: SquareButtonDown
+    SerializedGuid: 03083c2d62673d429c6a592c816b658a
+  - m_label: SquareButtonDisabled
+    SerializedGuid: 608707b22a36f140ab2d29eabef56312
+  TextureLabels: []
+  FontLabels: []
+  FontAssetLabels: []
+  VariantsNames:
+  - Default
+  Variants:
+  - m_variantName: Default
+    SerializedGuid: acf40d85e8b16349a2f60301bf23df11
+    Colors:
+    - m_color: {r: 1, g: 1, b: 1, a: 1}
+      SerializedGuid: 05f3d06d2cdbed4fa0800341476a137e
+    - m_color: {r: 1, g: 1, b: 1, a: 1}
+      SerializedGuid: b21968b6baf99843a44a8351a3df347f
+    - m_color: {r: 1, g: 1, b: 1, a: 1}
+      SerializedGuid: 5064711722e7bf48b81ea0ad3af23a50
+    - m_color: {r: 1, g: 1, b: 1, a: 1}
+      SerializedGuid: 14f3f2a93975da45aae01c93929ff075
+    - m_color: {r: 1, g: 1, b: 1, a: 1}
+      SerializedGuid: 191cbae9effd3b41bec63718273f688e
+    - m_color: {r: 1, g: 1, b: 1, a: 1}
+      SerializedGuid: b7e1ae274c07e34cbfb99c3370f290e5
+    - m_color: {r: 1, g: 0.80982494, b: 0, a: 1}
+      SerializedGuid: 651a3be7b55d4745a15c3becc52c5ac2
+    Sprites:
+    - m_sprite: {fileID: 21300000, guid: aed564b79c47225498d99fc48abad3d2, type: 3}
+      SerializedGuid: 0834282f574f1649bfaff15b6a78d2d3
+    - m_sprite: {fileID: 21300000, guid: f960256e3f405ca4a8ffe2707945fec7, type: 3}
+      SerializedGuid: e02216a4f45d6144a15bd115e078e6cd
+    - m_sprite: {fileID: 21300000, guid: 98e9493cfc0a6a1418ee6581694534f2, type: 3}
+      SerializedGuid: b5a0b3178874c944b5591ace40664b7c
+    - m_sprite: {fileID: 21300000, guid: aed564b79c47225498d99fc48abad3d2, type: 3}
+      SerializedGuid: eb292618157cf3438ab8d9b6ed860661
+    - m_sprite: {fileID: 21300000, guid: a50e72b59b2889e438af4c01bed12c20, type: 3}
+      SerializedGuid: f9f511be53693348888fc0769fa68129
+    - m_sprite: {fileID: 21300000, guid: fb780a97c453f4e4e8da404bc38424a6, type: 3}
+      SerializedGuid: 1ed50d7bbc0a724e81a0199a33f3f29d
+    - m_sprite: {fileID: 21300000, guid: b7f3cecf69a53e948b3aa9b5a9672913, type: 3}
+      SerializedGuid: 5740706a36c0a543b721a5a25aa34bcd
+    - m_sprite: {fileID: 21300000, guid: 87ee07807ce78524db83d6de90a8b75d, type: 3}
+      SerializedGuid: d6bc2549b7ab144abac1a3c38dd56297
+    - m_sprite: {fileID: 21300000, guid: 60aba7a14352f4e4e883a054df835215, type: 3}
+      SerializedGuid: e2e70ab564c43f4fb8cc38b6b6a7869b
+    - m_sprite: {fileID: 21300000, guid: b2ece19974cf77a4184b82b3b67f52d4, type: 3}
+      SerializedGuid: f895a1a1d9de76488aa3b01da2cfbd04
+    - m_sprite: {fileID: 21300000, guid: 87457dc1458dbbb4b97cb314f77f9214, type: 3}
+      SerializedGuid: a0330f4d5fe8884aa138c4174e5f830d
+    - m_sprite: {fileID: 21300000, guid: e600ce1fbe28d6f4fb6aa70f6783c749, type: 3}
+      SerializedGuid: 430b1dbfa6d5ab41b4919dcb935142fb
+    - m_sprite: {fileID: 21300000, guid: 7b2e22d695c6df248be4eac616154624, type: 3}
+      SerializedGuid: 96fdaaf56e8c224dbca282bb09cbbc6b
+    - m_sprite: {fileID: 21300000, guid: e2f0282d6bd25084ab16e2d2aeee4c9a, type: 3}
+      SerializedGuid: 4d3798c2c0df1f46be6e98998c8f7a33
+    - m_sprite: {fileID: 21300000, guid: 5fd3f14774c9e0f4580413f905f1b58b, type: 3}
+      SerializedGuid: 24f9885871dbf3418bd5cecd30e89393
+    - m_sprite: {fileID: 21300000, guid: b3269eef2ca137641a9497feb8d171d9, type: 3}
+      SerializedGuid: d0c7d08f6e83fa44b3187ece7f733efb
+    - m_sprite: {fileID: 21300000, guid: b3269eef2ca137641a9497feb8d171d9, type: 3}
+      SerializedGuid: 16f2a9c179d17f43a966a8c2ec79ca1d
+    - m_sprite: {fileID: 21300000, guid: e5d59660f8fa9864d81bf5c5dfd867e1, type: 3}
+      SerializedGuid: 1e0e0226910f5c40aae77c2dddae6002
+    - m_sprite: {fileID: 21300000, guid: b3ba5547182e4a84798a6ca575e9bdfa, type: 3}
+      SerializedGuid: 9cc8ee63f00431439e6023706faaa0e7
+    - m_sprite: {fileID: 21300000, guid: 7a9982f643a8e0a42aae73efcb07d32c, type: 3}
+      SerializedGuid: af5f16f4af77a945ab1ffd866f792d58
+    - m_sprite: {fileID: 21300000, guid: 4bc27dfb76c2b1d49828c0822b0e297c, type: 3}
+      SerializedGuid: 36663e2487c5ff4b83508db2b27512ee
+    - m_sprite: {fileID: 21300000, guid: 3138436c6256ce14a9f8af4e59a644ea, type: 3}
+      SerializedGuid: 03083c2d62673d429c6a592c816b658a
+    - m_sprite: {fileID: 21300000, guid: cdf5cb4512990554b9579cd1b596bfce, type: 3}
+      SerializedGuid: 608707b22a36f140ab2d29eabef56312
+    Textures: []
+    Fonts: []
+    FontAssets: []

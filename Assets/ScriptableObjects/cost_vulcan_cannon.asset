@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98d6cb086fbeaaf4a8dee5f29c92b331, type: 3}
+  m_Name: cost_vulcan_cannon
+  m_EditorClassIdentifier: 
+  Tile: {fileID: 4647046319183550258, guid: 5656dfa2f34c4c3409db33fa058cdd07, type: 3}
+  tileCost:
+  - resource: 0
+    Cost: 500
+  - resource: 1
+    Cost: 100

@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98d6cb086fbeaaf4a8dee5f29c92b331, type: 3}
+  m_Name: cost_industrial_district
+  m_EditorClassIdentifier: 
+  Tile: {fileID: 3233909334423752523, guid: a277b319c47363c4da1f92a1d0ac89eb, type: 3}
+  Icon: {fileID: 21300000, guid: 7f7437bae2bd89d4ba253f80d32481d7, type: 3}
+  tileCost:
+  - resource: 0
+    Cost: 1500
+  - resource: 1
+    Cost: 175

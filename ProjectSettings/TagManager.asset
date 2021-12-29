@@ -1,0 +1,102 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - cloneable
+  - astroid
+  - earth
+  - nuke
+  - nuke_exhaust
+  - missle_sprite
+  - nuclear_silo
+  - missle_panel
+  - missile_panel
+  - text_canvas
+  - healthbar_fill
+  - nuclear_spawn
+  - cavas_indicators
+  - selection_cam
+  - ui_canvas
+  - resources
+  - orbit
+  - tile_unlockable
+  - tile_require_shuttle
+  - ui_world_canvas
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - EARTH_GRAVITY_EFFECTOR_LAYER
+  - Earth
+  - Astroids
+  - astroids_no_collisions
+  - Weapons
+  - Tiles
+  - Resources
+  - shield
+  - indicators
+  - enemies
+  - tutorial_collider_layer
+  - satellites
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - UI_TOP
+  m_SortingLayers:
+  - name: background
+    uniqueID: 1811266041
+    locked: 0
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: UI
+    uniqueID: 2234019341
+    locked: 0
+  - name: earth
+    uniqueID: 2110939135
+    locked: 0
+  - name: tiles
+    uniqueID: 972367587
+    locked: 0
+  - name: astroid
+    uniqueID: 3433147123
+    locked: 0
+  - name: enemies
+    uniqueID: 1939492723
+    locked: 0
+  - name: satellites
+    uniqueID: 1337001167
+    locked: 0
+  - name: weapons
+    uniqueID: 1033341595
+    locked: 0
+  - name: shuttle
+    uniqueID: 2574501575
+    locked: 0
+  - name: resources
+    uniqueID: 1368184229
+    locked: 0
+  - name: explosions
+    uniqueID: 4224353269
+    locked: 0
+  - name: indicators
+    uniqueID: 3451438355
+    locked: 0
+  - name: UI_TOP
+    uniqueID: 3581150773
+    locked: 0

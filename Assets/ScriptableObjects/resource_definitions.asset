@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b526715d775b254db32309d09f52398, type: 3}
+  m_Name: resource_definitions
+  m_EditorClassIdentifier: 
+  resources:
+  - resource: 0
+    Name: Money
+    Image: {fileID: 21300000, guid: 771bf4f9ad9e3ae4ab742a8d40807cd3, type: 3}
+  - resource: 1
+    Name: Titanium
+    Image: {fileID: 21300000, guid: 8e4bee1bfadee614c831a4817c8921c7, type: 3}
+  - resource: 2
+    Name: People
+    Image: {fileID: 21300000, guid: 17f53a4eabffcf9439c23a4e2e6e9ea3, type: 3}
+  - resource: 3
+    Name: Uranium
+    Image: {fileID: 21300000, guid: 67f297f3b49666d4fa7716da07a8aca1, type: 3}
+  - resource: 4
+    Name: Unobtanium
+    Image: {fileID: 21300000, guid: 0c8a1c429d050de45b8faae74efee438, type: 3}

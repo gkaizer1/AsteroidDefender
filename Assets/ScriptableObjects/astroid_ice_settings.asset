@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7ee17ff2bf3ea242afacdc6c28387cf, type: 3}
+  m_Name: astroid_ice_settings
+  m_EditorClassIdentifier: 
+  StartSpeed: 0
+  Acceleration: 0.05
+  AstroidType: Fire Astroid
+  InitialHealth: 75
+  Damage: 10
+  MinScale: 0.5
+  MaxScale: 0.8
+  crater: {fileID: 9170846179485911812, guid: a79a771186c7fe94baea8552f16acd24, type: 3}
