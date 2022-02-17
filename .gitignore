@@ -35,6 +35,7 @@ Release/
 ExportedObj/
 .consulo/
 *.csproj
+*.meta
 *.unityproj
 *.sln
 *.suo
@@ -48,11 +49,12 @@ ExportedObj/
 *.mdb
 *.opendb
 *.VC.db
+*.meta
 
 # Unity3D generated meta files
 *.pidb.meta
 *.pdb.meta
-*.mdb.meta
+**/*.mdb.meta
 
 # Unity3D generated file on crash reports
 sysinfo.txt

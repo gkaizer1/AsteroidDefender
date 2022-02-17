@@ -48,6 +48,13 @@ public class EnemySpawningBehavior<T> : IState<T>
         rigidBody.velocity = Parent.transform.up * spawnVelocity;
         _enemyBehavior.IsActive = false;
 
+        /*
+         * fade in enemies since it's a bit cooler
+         */
+        SpriteRenderer spriteRender = Parent.GetComponent<SpriteRenderer>();
+        spriteRender.color = new Color(spriteRender.color.r, spriteRender.color.g, spriteRender.color.b, 0.0f);
+        spriteRender.DOFade(1.0f, 1.0f);
+
         _onSpawnStarted?.Invoke();
     }
 

@@ -25,11 +25,6 @@ public class RailGunBulletBehavior : MonoBehaviour
 
     bool _isHit = false;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-    }
-
     public void Fire()
     {
         _isHit = false;

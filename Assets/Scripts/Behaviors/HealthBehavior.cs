@@ -23,6 +23,20 @@ public class HealthBehavior : MonoBehaviour, IDamagable
     public bool DestroyOnDeath = true;
 
     public OnHealthChanged OnHealthChanged;
+    public GameObject explodeOnDeathPrefab;
+
+    private static GameObject _explosionContainer;
+
+    public void Start()
+    {
+        // Try to resolve the explosion container if possible
+        if(_explosionContainer == null)
+        {
+            _explosionContainer = GameObject.Find("ENEMIES_CONTAINER");
+        }
+        Health = MaxHealth;
+        OnHealthChanged?.Invoke(Health, MaxHealth);
+    }
 
     public float Health
     {
@@ -46,10 +60,15 @@ public class HealthBehavior : MonoBehaviour, IDamagable
         }
     }
 
-    void Start()
+    public void Explode()
     {
-        Health = MaxHealth;
-        OnHealthChanged?.Invoke(Health, MaxHealth);
+        if (explodeOnDeathPrefab != null)
+        {
+            var explosion = Instantiate(explodeOnDeathPrefab, _explosionContainer != null ? _explosionContainer.transform : this.transform.parent);
+            explosion.name = $"explosion_{name}";
+            explosion.transform.parent = this.transform.parent;
+            explosion.transform.position = this.transform.position;
+        }
     }
 
     public void DoDamage(float damage)

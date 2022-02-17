@@ -58,5 +58,5 @@ Material:
     - _Color: {r: 21.473091, g: 21.361254, b: 21.361254, a: 0.94509804}
     - _Flip: {r: 1, g: 1, b: 1, a: 1}
     - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
-    - hdrColor: {r: 55.13944, g: 55.13944, b: 55.13944, a: 1}
+    - hdrColor: {r: 39.946472, g: 39.946472, b: 39.946472, a: 1}
   m_BuildTextureStacks: []

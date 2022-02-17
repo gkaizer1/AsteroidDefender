@@ -4,12 +4,12 @@ using UnityEngine;
 public class ShuttleMission_BuildSatellite : IShuttleMission
 {
     GameObject _target = null;
-    TileUnderConstructionBehavior _underConstructionTile = null;
+    ConstructableBehavior _constructableBehavior = null;
     public bool MissionAccepted { get; set; } = false;
 
-    public ShuttleMission_BuildSatellite(GameObject target, TileUnderConstructionBehavior underConstructionTile)
+    public ShuttleMission_BuildSatellite(GameObject target, ConstructableBehavior underConstructionTile)
     {
-        _underConstructionTile = underConstructionTile;
+        _constructableBehavior = underConstructionTile;
         _target = target;
     }
 
@@ -23,7 +23,7 @@ public class ShuttleMission_BuildSatellite : IShuttleMission
             Acceleration = 0.5f,
             maxRotationPerSecond = 90.0f,
         }
-        .OnDestinationReached(() => new ShuttleBuildingSatelliteState(shuttle, _underConstructionTile));
+        .OnDestinationReached(() => new ShuttleBuildingSatelliteState(shuttle, _constructableBehavior));
 
         shuttle.target = _target;
 

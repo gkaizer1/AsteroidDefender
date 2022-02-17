@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.Events;
 
 #if UNITY_EDITOR
-[ExecuteAlways]
+//[ExecuteAlways]
 #endif
 public class SatelliteBehavior : MonoBehaviour
 {
@@ -15,6 +15,7 @@ public class SatelliteBehavior : MonoBehaviour
     public GameObject turnRadiusIndicator;
     public DragableBehavior rotatorHandle;
     public float rotationSpeed = 5f;
+    public float minAltitude = 11.0f;
 
     public GameObject endTurnIndicator;
     GameObject _endTurnIndicatorInstance;
@@ -34,6 +35,7 @@ public class SatelliteBehavior : MonoBehaviour
     public UnityEvent<SatelliteBehavior> OnMoveStarted;
     public UnityEvent<SatelliteBehavior> OnMoveEnded;
 
+    public bool IsRelocating = false;
 
     // Start is called before the first frame update
     void Start()
@@ -45,6 +47,8 @@ public class SatelliteBehavior : MonoBehaviour
         _boxCollider2D = GetComponent<BoxCollider2D>();
         if (_boxCollider2D == null)
             _boxCollider2D = GetComponentInParent<BoxCollider2D>();
+        if (_boxCollider2D == null)
+            gameObject.UnassignedReference($"Satellite missing polar transform component");
 
 #if UNITY_EDITOR
         if (UnityEditor.EditorApplication.isPlaying)
@@ -62,11 +66,13 @@ public class SatelliteBehavior : MonoBehaviour
 #endif
         if (turnRadiusIndicator != null)
         {
-            turnRadiusIndicator.transform.position = Vector3.zero;
-            turnRadiusIndicator.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+            turnRadiusIndicator.GetComponent<CircleBehavior>().radius = 0.0f;
             turnRadiusIndicator.GetComponent<CircleBehavior>().MinAngle = 0;
             turnRadiusIndicator.GetComponent<CircleBehavior>().MaxAngle = 0;
+            turnRadiusIndicator.SetActive(false);
         }
+
+        MoveToNextLegalLocation();
     }
 
     private void OnDestroy()
@@ -77,9 +83,18 @@ public class SatelliteBehavior : MonoBehaviour
 
     public void OnMouseDragStart(GameObject sender, Vector3 start)
     {
-        _movePrefabInstance = GameObject.Instantiate(this.movePrefabSatellite);
+        _previousMoveValid = true;
+        if (_movePrefabInstance != null)
+        {
+            Destroy(_movePrefabInstance);
+            _movePrefabInstance = null;
+        }
+        
+        _movePrefabInstance = GameObject.Instantiate(this.movePrefabSatellite, this.transform.parent);
+        _movePrefabInstance.name = $"{this.name}_move";
         _movePrefabInstance.GetComponent<PolarCoordinateTransform>().Angle = _polarTransform.Angle;
         _movePrefabInstance.GetComponent<PolarCoordinateTransform>().Radius = _polarTransform.Radius;
+        _movePrefabInstance.transform.rotation = Quaternion.Euler(0f, 0f, _polarTransform.Angle);
 
         SelectionManager.SelectedGameObject = this.gameObject;
 
@@ -103,22 +118,24 @@ public class SatelliteBehavior : MonoBehaviour
             verticalLine.positionCount = 2;
             verticalLine.SetPositions(new Vector3[2]
             {
-                Utils.ComputeCirclePosition(_polarTransform.Angle, _polarTransform.Radius),
-                Utils.ComputeCirclePosition(_polarTransform.Angle, _polarTransform.Radius)
+                Utils.PolarToCartesian(_polarTransform.Angle, _polarTransform.Radius),
+                Utils.PolarToCartesian(_polarTransform.Angle, _polarTransform.Radius)
             });
         }
     }
+
+    bool _previousMoveValid = true;
 
     public void OnMouseDrag(GameObject sender, Vector3 start, Vector3 end)
     {
         Doozy.Engine.GameEventMessage.SendEvent("HIDE_BUILD_PANELS");
         var endGameWorld = Camera.main.ScreenToWorldPoint(end);
 
-        Vector3 currentCoords = Utils.ComputeCirclePosition(_dragAngleEnd, _dragRadiusEnd);
+        Vector3 currentCoords = Utils.PolarToCartesian(_dragAngleEnd, _dragRadiusEnd);
         var distanceFromEnd = Vector2.Distance(currentCoords, endGameWorld);
 
         Vector3 delta = endGameWorld - currentCoords;
-        float vertAngle = Vector2.SignedAngle(Utils.ComputeCirclePosition(_dragAngleEnd, 1), delta);
+        float vertAngle = Vector2.SignedAngle(Utils.PolarToCartesian(_dragAngleEnd, 1), delta);
 
         // Mouse is pointing "up"
         if (Mathf.Abs(vertAngle) < 10.0f)
@@ -132,6 +149,9 @@ public class SatelliteBehavior : MonoBehaviour
                 _dragRadiusEnd -= 2;
         }
 
+        if (_dragRadiusEnd < minAltitude)
+            _dragRadiusEnd = minAltitude;
+
         float angleDelta = Vector2.SignedAngle(
                                 Camera.main.ScreenToWorldPoint(start),
                                 Camera.main.ScreenToWorldPoint(end));
@@ -144,17 +164,80 @@ public class SatelliteBehavior : MonoBehaviour
 
         _movePrefabInstance.GetComponent<PolarCoordinateTransform>().Radius = _dragRadiusEnd;
         _movePrefabInstance.GetComponent<PolarCoordinateTransform>().Angle = _dragAngleEnd;
+        _movePrefabInstance.transform.rotation = Quaternion.Euler(0f, 0f, _dragAngleEnd);
 
         verticalLine.positionCount = 2;
         verticalLine.SetPositions(new Vector3[2]
         {
-            Utils.ComputeCirclePosition(_polarTransform.Angle, _polarTransform.Radius),
-            Utils.ComputeCirclePosition(_polarTransform.Angle, _dragRadiusEnd)
+            Utils.PolarToCartesian(_polarTransform.Angle, _polarTransform.Radius),
+            Utils.PolarToCartesian(_polarTransform.Angle, _dragRadiusEnd)
         });
+
+
+        _movePrefabInstance.transform.rotation = Quaternion.Euler(0f, 0f, _dragAngleEnd);
+        _movePrefabInstance.transform.localRotation = Quaternion.Euler(0f, 0f, _dragAngleEnd - 90.0f);
+        if (!IsValidLocation(_dragRadiusEnd, _dragAngleEnd))
+        {
+            if (_previousMoveValid)
+            {
+                var children = _movePrefabInstance.GetComponentsInChildren<SpriteRenderer>();
+                foreach (var child in children)
+                {
+                    child?.material.SetColor("_Color", Color.red);
+                }
+                _previousMoveValid = false;
+            }
+        }
+        else
+        {
+            if(!_previousMoveValid)
+            {
+                _previousMoveValid = true;
+                var children = _movePrefabInstance.GetComponentsInChildren<SpriteRenderer>();
+                foreach (var child in children)
+                {
+                    child?.material.SetColor("_Color", Color.white);
+                }
+            }
+        }
+
+    }
+
+
+    public void OnMouseDragEnd(GameObject sender, Vector3 start, Vector3 end)
+    {
+        foreach (var autoAimBehavior in this.GetComponentsInChildren<AutoAimBehavior>())
+            autoAimBehavior.HideRangeCircle();
+
+        // Cleanup move prefab indicator
+        if (_movePrefabInstance != null)
+        {
+            Destroy(_movePrefabInstance);
+            _movePrefabInstance = null;
+        }
+
+        if (!IsValidLocation(_dragRadiusEnd, _dragAngleEnd))
+        {
+            turnRadiusIndicator.SetActive(false);
+            verticalLine.enabled = false;
+            return;
+        }
+
+        // Remove the turn radius Indicator
+        turnRadiusIndicator.GetComponent<CircleBehavior>().MinAngle = 0;
+        turnRadiusIndicator.GetComponent<CircleBehavior>().MaxAngle = 0;
+        turnRadiusIndicator.SetActive(false);
+
+        // Delesect this object
+        SelectionManager.SelectedGameObject = null;
+
+        MoveSatellite(_dragRadiusEnd, _dragAngleEnd);
     }
 
     public float AngleToNearestValid(float angle, float radius)
     {
+        // Round down radius in increment of 5 (e.g radis 17 -> 15, 23 -> 20, etc.)
+        radius = radius - (radius % 7.0f);
         float degPerGameUnit = 360.0f / (2.0f * radius * Mathf.PI);
         float degPerSatellite = 1.5f * degPerGameUnit;
 
@@ -164,169 +247,56 @@ public class SatelliteBehavior : MonoBehaviour
 
     public float NextAngleToNearestValid(float angle, float count)
     {
-        float degPerGameUnit = 360.0f / (2.0f * _polarTransform.Radius * Mathf.PI);
+        // Round down radius in increment of 5 (e.g radis 17 -> 15, 23 -> 20, etc.)
+        float radius = _polarTransform.Radius - (_polarTransform.Radius % 7.0f);
+        float degPerGameUnit = 360.0f / (2.0f * radius * Mathf.PI);
         float degPerSatellite = 1.5f * degPerGameUnit;
+        float offset = degPerSatellite * count;
 
         // Get an integer multiplier
-        return Mathf.Round((angle + degPerSatellite * count) / degPerSatellite) * (degPerSatellite);
+        return Mathf.Round((angle + offset) / degPerSatellite) * (degPerSatellite);
     }
 
-    public void OnMouseDragEnd(GameObject sender, Vector3 start, Vector3 end)
+    Tweener _exhaustTween;
+    public void ToggleExhaust(bool exhuastOn, System.Action onCompleted = null)
     {
-        foreach (var autoAimBehavior in this.GetComponentsInChildren<AutoAimBehavior>())
-            autoAimBehavior.HideRangeCircle();
-
-        if (_movePrefabInstance != null)
+        // If there is an exhuast tween playing --- stop, before doing anything
+        if(_exhaustTween != null && _exhaustTween.IsPlaying())
         {
-            Destroy(_movePrefabInstance);
-            _movePrefabInstance = null;
+            _exhaustTween.Kill();
+            _exhaustTween = null;
         }
 
-        if (CheckSatelliteAtPosition(_dragRadiusEnd, _dragAngleEnd) != null)
+        if (exhuastOn)
         {
-            turnRadiusIndicator.SetActive(false);
-            verticalLine.enabled = false;
-            return;
+            exhaust.SetActive(true);
+            _exhaustTween = exhaust.transform.DOScaleY(1.0f, 0.5f)
+                .OnComplete(() => onCompleted?.Invoke())
+                .OnKill(()=> _exhaustTween = null);
+        }
+        else
+        {
+            _exhaustTween = exhaust.transform.DOScaleY(0.0f, 0.5f)
+                .OnComplete(() =>
+                {
+                    exhaust.SetActive(false);
+                    onCompleted?.Invoke();
+                    _exhaustTween = null;
+                })
+                .OnKill(() => _exhaustTween = null);
         }
 
-        MoveSatellite(_dragRadiusEnd, _dragAngleEnd);
-    }
-
-    public SatelliteBehavior CheckSatelliteAtPosition(float radius, float angle)
-    {
-        var vectEndPosition = Utils.ComputeCirclePosition(angle, radius);
-        var satelliteLayer = LayerMask.NameToLayer("satellites");
-        var itemsInRadius = Physics2D.OverlapCircleAll(vectEndPosition, 0.5f, (1 << satelliteLayer));
-        if (itemsInRadius != null && itemsInRadius.Length > 0)
-        {
-            foreach (var item in itemsInRadius)
-            {
-                if (item.gameObject == this.gameObject)
-                    continue;
-
-                if (item.GetComponent<SatelliteBehavior>() == null)
-                    continue;
-
-                return item.GetComponent<SatelliteBehavior>();
-            }
-        }
-
-        return null;
     }
 
     public void MoveSatellite(float radius, float angle, System.Action OnMoveCompleted = null)
     {
+        if (this.IsRelocating)
+            return;
+        this.IsRelocating = true;
+
         OnMoveStarted?.Invoke(this);
 
-        // Disable collisions when moving
-        if (_boxCollider2D != null)
-            _boxCollider2D.enabled = false;
-
-        turnRadiusIndicator.GetComponent<CircleBehavior>().MinAngle = 0;
-        turnRadiusIndicator.GetComponent<CircleBehavior>().MaxAngle = 0;
-
         float endAngle = AngleToNearestValid(angle, radius);
-
-        // add the final point
-        if (this.endTurnIndicator != null)
-        {
-            if (_endTurnIndicatorInstance == null)
-                _endTurnIndicatorInstance = Instantiate(this.endTurnIndicator);
-
-            _endTurnIndicatorInstance.transform.position = Utils.ComputeCirclePosition(endAngle, radius);
-        }
-
-        float distance = (radius * 2f * Mathf.PI) * (Mathf.Abs(_polarTransform.Angle - endAngle) / 360f);
-        float rotationTime = distance / rotationSpeed;
-
-        float rotationDelta = _polarTransform.Angle - endAngle;
-        System.Action doRotation = () =>
-        {
-
-            DOTween.To(() => this._polarTransform.Angle,
-                    x => _polarTransform.Angle = x,
-                    endAngle,
-                    rotationTime)
-                .OnUpdate(() =>
-                    {
-                        turnRadiusIndicator.GetComponent<CircleBehavior>().MinAngle = _polarTransform.Angle;
-                    })
-                .OnStart(() =>
-                {
-                    body.transform.localRotation = Quaternion.Euler(0, 0, rotationDelta > 0 ? 180f : 0f);
-                    turnRadiusIndicator.GetComponent<CircleBehavior>().MaxAngle = endAngle;
-                })
-                .OnComplete(() =>
-                {
-                    if (CheckSatelliteAtPosition(_polarTransform.Radius, _polarTransform.Angle))
-                    {
-                        MoveSatellite(_polarTransform.Radius + 1, _polarTransform.Angle, OnMoveCompleted);
-                        return;
-                    }
-
-                    OnMoved();
-                    OnMoveEnded?.Invoke(this);
-                    OnMoveCompleted?.Invoke();
-                });
-        };
-
-        if (_polarTransform.Radius != radius)
-        {
-            float orbitdelta = _polarTransform.Radius - radius;
-            if (orbitdelta > 0)
-                body.transform.localRotation = Quaternion.Euler(0, 0, -90f);
-            else
-                body.transform.localRotation = Quaternion.Euler(0, 0, -90f);
-
-            float increaseOrbitTime = Mathf.Abs(orbitdelta) / rotationSpeed;
-            DOTween.To(() => this._polarTransform.Radius,
-                            x => _polarTransform.Radius = x,
-                            radius,
-                            increaseOrbitTime)
-                        .OnComplete(() =>
-                        {
-                            verticalLine.enabled = false;
-                            body.transform.localRotation = Quaternion.Euler(0, 0, 0);
-                            doRotation();
-                        })
-                        .OnUpdate(() =>
-                        {
-                            verticalLine.SetPositions(new Vector3[2]
-                            {
-                                    Utils.ComputeCirclePosition(_polarTransform.Angle, _polarTransform.Radius),
-                                    Utils.ComputeCirclePosition(_polarTransform.Angle, radius)
-                            });
-                        });
-        }
-        else
-        {
-            doRotation();
-        }
-
-        // Activate the exhaust
-        exhaust.SetActive(true);
-    }
-
-    public void ConnectToSatellite(SatelliteBehavior satellite, LineRenderer line)
-    {
-        Vector3 delta = satellite.transform.position - this.transform.position;
-
-        line.enabled = true;
-        line.SetPosition(0, this.transform.position);
-        line.SetPosition(1, this.transform.position);
-        DOTween.To(() => line.GetPosition(1),
-                    x => line.SetPosition(1, x),
-                    this.transform.position + delta,
-                    1f);
-    }
-
-    void OnMoved()
-    {
-        if (_boxCollider2D != null)
-            _boxCollider2D.enabled = true;
-
-        // Recalculate all graphs
-        AstarPath.active.Scan();
 
         if (_endTurnIndicatorInstance != null)
         {
@@ -334,32 +304,250 @@ public class SatelliteBehavior : MonoBehaviour
             _endTurnIndicatorInstance = null;
         }
 
+        // add the final point
+        if (_endTurnIndicatorInstance == null)            
+            _endTurnIndicatorInstance = Instantiate(this.endTurnIndicator, this.transform.parent);            
+
+        _endTurnIndicatorInstance.transform.position = Utils.PolarToCartesian(endAngle, radius);
+        _endTurnIndicatorInstance.transform.rotation = Quaternion.Euler(0f, 0f, endAngle);
+        _endTurnIndicatorInstance.transform.localRotation = Quaternion.Euler(0f, 0f, endAngle - 90.0f);        
+
+        float distance = (radius * 2f * Mathf.PI) * (Mathf.Abs(_polarTransform.Angle - endAngle) / 360f);
+        float rotationTime = distance / rotationSpeed;
+
+        float rotationDelta = _polarTransform.Angle - endAngle;
+        System.Action doHorizontalMove = () =>
+        {
+            // 1. Rotate the body to the right orientation
+            // 2. Start moving !
+            float rotationDirection = rotationDelta <= 0 ? 180f : 0f;
+            if(Mathf.Abs(rotationDelta) < 0.1f)
+            {
+                this._polarTransform.Angle = endAngle;
+                OnMoved();
+                OnMoveCompleted?.Invoke();
+                return;
+            }
+
+            float angleDelta = Mathf.DeltaAngle(this.body.transform.rotation.eulerAngles.z, _polarTransform.Angle + rotationDirection);
+            float timeToRotate = Mathf.Abs(angleDelta / 180.0f) * 2.0f;
+            this.body.transform.DOLocalRotate(new Vector3(0, 0, _polarTransform.Angle + rotationDirection), timeToRotate)
+                .OnStart(() =>
+                {
+                    turnRadiusIndicator.GetComponent<CircleBehavior>().MinAngle = _polarTransform.Angle;
+                    turnRadiusIndicator.GetComponent<CircleBehavior>().MaxAngle = endAngle;
+                    turnRadiusIndicator.SetActive(true);
+                    ToggleExhaust(false);
+                })
+                .OnComplete(() =>
+                {
+                    ToggleExhaust(true, 
+                        // After exhaust has been turned on
+                        // Only then start moving
+                        () =>
+                        {
+                            DOTween.To(() => this._polarTransform.Angle,
+                                    x => _polarTransform.Angle = x,
+                                    endAngle,
+                                    rotationTime * 5.0f)
+                                .OnUpdate(() =>
+                                {
+                                    turnRadiusIndicator.GetComponent<CircleBehavior>().MinAngle = _polarTransform.Angle;
+                                    this.body.transform.rotation = Quaternion.Euler(0f, 0f, _polarTransform.Angle + rotationDirection);
+                                })
+                                .OnStart(() =>
+                                {
+                                })
+                                .OnComplete(() =>
+                                {
+                                    // Disabled - since the body should be in the correct position by this point
+                                    // Reset rotation to proper horizontal angle
+                                    // body.transform.localRotation = Quaternion.Euler(0, 0, 0.0f);
+
+                                    OnMoved();
+                                    OnMoveCompleted?.Invoke();
+                                });
+                        });
+                });
+        };
+
+        if (_polarTransform.Radius != radius)
+        {
+            float orbitdelta = _polarTransform.Radius - radius;
+            float currentRotation = this.body.transform.rotation.eulerAngles.z;
+            float finalAngle = this._polarTransform.Angle + (orbitdelta > 0 ? -90f : 90f);
+            float timeToNormalize = Mathf.Abs((finalAngle - currentRotation) / 180.0f) * 2.0f;
+
+            // 1. Rotate body to start movment
+            // 2. Do vertical movment
+            // 3. Execute horizontal movment
+            this.body.transform.DOLocalRotate(new Vector3(0, 0, finalAngle), timeToNormalize)
+                .OnStart(() =>
+                {
+                    ToggleExhaust(false);
+                })
+                .OnComplete(() =>
+                {
+                    ToggleExhaust(true);
+
+                    float increaseOrbitTime = Mathf.Abs(orbitdelta) / rotationSpeed;
+                    DOTween.To(() => this._polarTransform.Radius,
+                                    x => _polarTransform.Radius = x,
+                                    radius,
+                                    increaseOrbitTime * 5.0f)
+                                .OnComplete(() =>
+                                {
+                                    verticalLine.enabled = false;
+
+                                    // Move horizontally
+                                    doHorizontalMove();
+                                })
+                                .OnUpdate(() =>
+                                {
+                                    verticalLine.SetPositions(new Vector3[2]
+                                    {
+                                        Utils.PolarToCartesian(_polarTransform.Angle, _polarTransform.Radius),
+                                        Utils.PolarToCartesian(_polarTransform.Angle, radius)
+                                    });
+                                });
+                });
+
+            
+        }
+        else
+        {
+            // Just move horizontally
+            doHorizontalMove();
+        }
+    }
+
+    void RotateToStationary(System.Action onRotationCompelted = null)
+    {
+        float currentRotation = this.body.transform.rotation.eulerAngles.z;
+        float finalAngle = this._polarTransform.Angle + 90.0f;
+        float timeToNormalize = Mathf.Abs((finalAngle - currentRotation) / 180.0f) * 2.0f;
+        this.body.transform.DOLocalRotate(new Vector3(0, 0, finalAngle), timeToNormalize).OnComplete(() =>
+        {
+            onRotationCompelted?.Invoke();
+            OnMoveEnded?.Invoke(this);
+        });
+    }
+
+    void OnMoved()
+    {
+        if (_endTurnIndicatorInstance != null)
+        {
+            Destroy(_endTurnIndicatorInstance);
+            _endTurnIndicatorInstance = null;
+        }
+
+        RotateToStationary(() =>
+        {
+            this.IsRelocating = false;
+            OnSatelliteMoved?.Invoke();
+        });
+
         verticalLine.enabled = false;
         if (turnRadiusIndicator != null)
             turnRadiusIndicator.SetActive(false);
 
-        exhaust.SetActive(false);
-        OnSatelliteMoved?.Invoke();
+        ToggleExhaust(false);
 
-        CheckSatelliteAtPosition(_polarTransform.Radius, NextAngleToNearestValid(_polarTransform.Angle, 1));
+        if (!IsValidLocation(_polarTransform.Radius, _polarTransform.Angle))
+            MoveToNextLegalLocation();
     }
 
-    public bool isRelocating = false;
+    static bool _canMoveNextSatellite = true;
+    private IEnumerator co_MoveToNextLegalLocation()
+    {
+        // Quick explanation
+        // We only want to schedule ONE move at a time
+        // so only one satellite can escape this loop at a time
 
-    private void OnTriggerEnter2D(Collider2D collision)
+        while(!_canMoveNextSatellite)
+        {
+            yield return new WaitForSeconds(0.25f);
+        }
+
+        float minRadius = this._polarTransform.Radius;
+        if (this._polarTransform.Radius < minAltitude)
+            minRadius = minAltitude;
+
+        for (int r = 0; r < 10; r++)
+        {
+            bool done = false;
+            float radius = minRadius + r;
+            for (float i = 0; i < 180f && !done; i += 5f)
+            {
+                float delta = (i % 180f);
+                float newAngle = this._polarTransform.Angle + delta;
+                float nextAngle = AngleToNearestValid(newAngle, minRadius + radius);
+                if (IsValidLocation(radius, nextAngle))
+                {
+                    _canMoveNextSatellite = false;
+                    MoveSatellite(radius, nextAngle);
+                    done = true;
+                    break;
+                }
+
+                newAngle = this._polarTransform.Angle - delta;
+                nextAngle = AngleToNearestValid(newAngle, minRadius + radius);
+                if (IsValidLocation(radius, nextAngle))
+                {
+                    _canMoveNextSatellite = false;
+                    MoveSatellite(radius, nextAngle);
+                    done = true;
+                    break;
+                }
+            }
+            if(done)
+            {
+                break;
+            }
+        }
+
+        yield return new WaitForSeconds(0.25f);
+        _canMoveNextSatellite = true;
+
+        yield return null;
+    }
+
+    private void MoveToNextLegalLocation()
+    {
+        StartCoroutine(co_MoveToNextLegalLocation());
+    }
+
+    public bool IsValidLocation(float radius, float angle)
     {
         var satelliteLayer = LayerMask.NameToLayer("satellites");
-        if (collision.gameObject.layer == satelliteLayer)
+        var collisions = Physics2D.OverlapBoxAll(Utils.PolarToCartesian(angle, radius), new Vector3(1, 1, 1), 0f, 1 << satelliteLayer);
+        foreach (var collision in collisions)
         {
             var satellite = collision.gameObject.GetComponent<SatelliteBehavior>();
-            if (satellite == null || satellite.isRelocating)
-                return;
+            if (satellite?.IsRelocating ?? false)
+                continue;
 
-            isRelocating = true;
-            MoveSatellite(_polarTransform.Radius + 1, _polarTransform.Angle, () =>
-            {
-                isRelocating = false;
-            });
+            if (_movePrefabInstance && collision.gameObject == _movePrefabInstance)
+                continue;
+
+            if (_endTurnIndicatorInstance && collision.gameObject == _endTurnIndicatorInstance)
+                continue;
+
+            if (collision.gameObject == this.gameObject)
+                continue;
+
+            return false;
+        }
+
+        return true;
+    }
+
+    private void OnDrawGizmos()
+    {
+        for(int i = 0; i < 360; i += 10)
+        {
+            float angle = AngleToNearestValid(i, this._polarTransform.Radius);
+            Gizmos.DrawCube(Utils.PolarToCartesian(angle, this._polarTransform.Radius), new Vector3(1, 1, 1));
         }
     }
 }

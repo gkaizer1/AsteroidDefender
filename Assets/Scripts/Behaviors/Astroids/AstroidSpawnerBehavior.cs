@@ -23,6 +23,11 @@ public class EnemySpawnSetting
     public enum SpawnType { SINGLE, ALL_IN_ORBIT };
 }
 
+public class EnemySpawnerBehavior : AstroidSpawnerBehavior
+{
+
+}
+
 public class AstroidSpawnerBehavior : MonoBehaviour
 {
     public bool spawnOnAwake = true;
@@ -59,11 +64,11 @@ public class AstroidSpawnerBehavior : MonoBehaviour
         _enemiesToSpawn = 0;
         Enemies.ForEach(x => _enemiesToSpawn += x.count);
 
-        _enemyContainer = GameObject.Find("ENEMIES_CONTAINER");
+        _enemyContainer = GameObject.Find(enemyContainerName) ?? throw  new ArgumentException($"No container named [{enemyContainerName}] found");
 
         OnSpawnerInitialized?.Invoke();
         if (spawnOnAwake)
-            StartSpawningAstroids();
+            StartSpawningEnemies();
     }
 
 
@@ -112,11 +117,6 @@ public class AstroidSpawnerBehavior : MonoBehaviour
         StartCoroutine(co_LevelCompletionChecker());
     }
 
-    public void StartSpawningAstroids()
-    {
-        StartSpawningEnemies();
-    }
-
     IEnumerator co_LevelCompletionChecker()
     {
 
@@ -159,15 +159,15 @@ public class AstroidSpawnerBehavior : MonoBehaviour
 
     public void SpawnEnemy(EnemySpawnSetting settings)
     {
-        if (AstroidsContainer.Instance == null)
-            return;
-
         _enemiesToSpawn--;
         if(_worldTextInstance != null)
             _worldTextInstance.GetComponent<CanvasScreenBehavior>().Text = $"x{_enemiesToSpawn.ToString()}";
 
-        float xStartPos = this.transform.position.x;
-        float yStartPos = this.transform.position.y;
+        float randomRange = UnityEngine.Random.Range(0, 2);
+        float randomAngle = UnityEngine.Random.Range(0, 360);
+
+        float xStartPos = this.transform.position.x + (randomRange * Mathf.Cos(randomAngle));
+        float yStartPos = this.transform.position.y + (randomRange * Mathf.Sin(randomAngle));
 
         GameObject enemy = Instantiate(settings.enemyPrefab, _enemyContainer == null ? null : _enemyContainer.transform);
         enemy.transform.position = new Vector3(xStartPos, yStartPos, 1.0f);

@@ -63,7 +63,7 @@ public class ClickHandler : MonoBehaviour
 
             Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Vector2 mousePos2D = new Vector2(mousePos.x, mousePos.y);
-            var hits = Physics2D.OverlapCircleAll(mousePos2D, 1f).ToList();
+            var hits = Physics2D.OverlapCircleAll(mousePos2D, 1f);
             GameObject selectedObject = null;
             float minDistance = float.MaxValue;
             foreach (var hit in hits)

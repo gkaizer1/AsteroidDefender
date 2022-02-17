@@ -8,21 +8,12 @@ public class EnemySpaceFigherBehavior : MonoBehaviour
     StateManager<EnemySpaceFigherBehavior> _stateManager;
     Vector3 _startPostion;
     Vector2 _targetPoint;
-    Vector3 _debugPnt;
-    Seeker _seeker;
 
-    void DisableTrails()
+    void ToggleTrails(bool enable)
     {
         foreach (var trail in this.GetComponentsInChildren<TrailRenderer>())
         {
-            trail.enabled = false;
-        }
-    }
-    void EnableTrails()
-    {
-        foreach (var trail in this.GetComponentsInChildren<TrailRenderer>())
-        {
-            trail.enabled = true;
+            trail.enabled = enable;
         }
     }
 
@@ -30,13 +21,12 @@ public class EnemySpaceFigherBehavior : MonoBehaviour
     {
         _startPostion = this.transform.position;
         _targetPoint = Utils.GenerateRandomPointInEarth();
-        DisableTrails();
-        _debugPnt = Utils.GenerateClosestPointToEarth(this.transform.position);
+        ToggleTrails(false);
 
         var initialState = new EnemySpawningBehavior<EnemySpaceFigherBehavior>(this)
             .OnSpawnCompleted(() =>
             {
-                EnableTrails();
+                ToggleTrails(true);
                 return new FlyToSeekerBehavior<EnemySpaceFigherBehavior>(this, Utils.GenerateClosestPointToEarth(this.transform.position))
                 {
                     StopDistance = 1.0f

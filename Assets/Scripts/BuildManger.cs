@@ -64,13 +64,20 @@ public class BuildManger : MonoBehaviour
     private void BuildSatellite(BuildSatelliteInfo buildItem)
     {
         GameObject underContruction = Instantiate(satellitePrefab);
-        var underConstructionBehavior = underContruction.GetComponent<TileUnderConstructionBehavior>();
-        underConstructionBehavior.constructionTime = 5.0f;
+        
+        var construcatbleBehavior = underContruction.GetComponent<ConstructableBehavior>();
+        construcatbleBehavior.constructionTime = 5.0f;
+        construcatbleBehavior.ObjectToConstructPrefab = buildItem.SatellitePrefab;
+        construcatbleBehavior.IsBuilding = false;
 
-        underConstructionBehavior.TileToBuild = buildItem.SatellitePrefab;
-        underConstructionBehavior.IsBuilding = false;
+        var polarCoordinate = underContruction.GetComponent<PolarCoordinateTransform>();
+        if (polarCoordinate)
+        {
+            polarCoordinate.Angle = 180.0f;
+            polarCoordinate.Radius = 10.0f;
+        }
 
-        ShuttleMission_BuildSatellite mission = new ShuttleMission_BuildSatellite(underContruction, underConstructionBehavior);
+        ShuttleMission_BuildSatellite mission = new ShuttleMission_BuildSatellite(underContruction, construcatbleBehavior);
         ShuttleMissionManager.Instance.ScheduleMission(mission);
     }
 
@@ -98,17 +105,9 @@ public class BuildManger : MonoBehaviour
         }
 
         var underConstructionBehavior = underContruction.GetComponent<TileUnderConstructionBehavior>();
-        underConstructionBehavior.constructionTime = 5.0f;
-
-        if (isInSpace || tile.GetComponent<SatelliteBehavior>() != null)
-        {
-            underConstructionBehavior.TileToBuild = satellitePrefab;
-            underConstructionBehavior.IsBuilding = false;
-            ShuttleMission_BuildSatellite mission = new ShuttleMission_BuildSatellite(underContruction, underConstructionBehavior);
-            ShuttleMissionManager.Instance.ScheduleMission(mission);
-        }
-        else
-        {
+        if(underConstructionBehavior)
+        { 
+            underConstructionBehavior.constructionTime = 5.0f;
             underConstructionBehavior.TileToBuild = buildItem.prefab;
         }
 
@@ -146,6 +145,7 @@ public class BuildManger : MonoBehaviour
                 Debug.LogError($"Failed to find satellite build item [{buildItem}]");
                 return;
             }
+
             BuildSatellite(buildItemInfo);
             GameEventMessage.SendEvent("HIDE_BUILD_PANEL");
         }

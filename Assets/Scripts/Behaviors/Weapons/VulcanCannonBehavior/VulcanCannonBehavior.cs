@@ -32,8 +32,7 @@ public class VulcanCannonBehavior : MonoBehaviour, IStateMachine
 
     ObjectPool<GameObject> _bulletPool = null;
 
-    static ObjectPool<GameObject> _bulletPoolRegular = null;
-    static ObjectPool<GameObject> _bulletPoolUpgraded = null;
+    static Dictionary<GameObject, ObjectPool<GameObject>> _bulletPoolDictionary = new Dictionary<GameObject, ObjectPool<GameObject>>();
 
     public float rotationSpeed = 180.0f;
 
@@ -43,9 +42,9 @@ public class VulcanCannonBehavior : MonoBehaviour, IStateMachine
     // Start is called before the first frame update
     void Start()
     {
-        if (_bulletPoolRegular == null)
+        if(!_bulletPoolDictionary.ContainsKey(bulletPrefab))
         {
-            _bulletPoolRegular = new ObjectPool<GameObject>(
+            _bulletPoolDictionary[bulletPrefab] = new ObjectPool<GameObject>(
                () => Instantiate(bulletPrefab, WeaponsContainerBehavior.Instance.transform), // Create
                x => x.SetActive(true), // Take
                x => x.SetActive(false), // Return to bool
@@ -54,10 +53,9 @@ public class VulcanCannonBehavior : MonoBehaviour, IStateMachine
                10, // Default size
                500); // Max Size
         }
-
-        if (_bulletPoolUpgraded == null)
+        if (bulletPrefabUpgraded != null && !_bulletPoolDictionary.ContainsKey(bulletPrefabUpgraded))
         {
-            _bulletPoolUpgraded = new ObjectPool<GameObject>(
+            _bulletPoolDictionary[bulletPrefabUpgraded] = new ObjectPool<GameObject>(
                () => Instantiate(bulletPrefabUpgraded, WeaponsContainerBehavior.Instance.transform), // Create
                x => x.SetActive(true), // Take
                x => x.SetActive(false), // Return to bool
@@ -67,7 +65,7 @@ public class VulcanCannonBehavior : MonoBehaviour, IStateMachine
                500); // Max Size
         }
 
-        _bulletPool = _bulletPoolRegular;
+        _bulletPool = _bulletPoolDictionary[bulletPrefab];
 
         _state = new StateManager<VulcanCannonBehavior>(new VulcanCannonIdleState(this));
 
@@ -111,7 +109,7 @@ public class VulcanCannonBehavior : MonoBehaviour, IStateMachine
 
     public void UpgradeAmmo()
     {
-        _bulletPool = _bulletPoolUpgraded;
+        _bulletPool = _bulletPoolDictionary[bulletPrefabUpgraded];
         this.bulletSpeed *= 1.5f;
         this.damagePerBullet *= 1.25f;
         OnUpgradeUnlocked();

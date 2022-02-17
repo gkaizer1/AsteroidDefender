@@ -9,6 +9,7 @@ public class HideablePanel : MonoBehaviour
     private Animator _animator;
 
     public string ShowMessage;
+    public List<string> HideMessages;
     public string HideMessage;
 
     public Vector2 ShowPostion;
@@ -71,7 +72,7 @@ public class HideablePanel : MonoBehaviour
             }
         }
 
-        if (message.EventName == HideMessage)
+        if (message.EventName == HideMessage || HideMessages.Contains(message.EventName))
         {
             if (_animator != null)
                 _animator.SetTrigger("HIDE_PANEL");

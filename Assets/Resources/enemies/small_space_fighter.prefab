@@ -27,6 +27,7 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -0.429, y: -0.248, z: 0}
   m_LocalScale: {x: 0.29999998, y: 0.29999998, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7817752578630194496}
   m_RootOrder: 0
@@ -184,7 +185,8 @@ Transform:
   m_GameObject: {fileID: 7817752578630194491}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7817752578255283614}
   - {fileID: 7817752578722652530}
@@ -212,7 +214,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -315,8 +317,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b50e6fd4534b8e14d839581e35417c88, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Acceleration: 0.1
-  MaxSpeed: 1
+  Acceleration: 0.3
+  MaxSpeed: 2
   MaxRotationPerSecond: 360
   StopHalfwayThrough: 0
   StopAtTarget: 0
@@ -338,6 +340,7 @@ MonoBehaviour:
   OnHealthChanged:
     m_PersistentCalls:
       m_Calls: []
+  explodeOnDeathPrefab: {fileID: 7070906393410427333, guid: 8eadcdf1bb4626e4ea27501fc938dfe8, type: 3}
 --- !u!114 &7817752578630194499
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -352,7 +355,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _isActive: 1
   stopAfterSpawn: 0
-  spawnSpeed: 0.25
+  spawnSpeed: 0.5
 --- !u!114 &7155108267386682245
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -456,6 +459,7 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0.429, y: -0.248, z: 0}
   m_LocalScale: {x: 0.29999998, y: 0.29999998, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7817752578630194496}
   m_RootOrder: 1

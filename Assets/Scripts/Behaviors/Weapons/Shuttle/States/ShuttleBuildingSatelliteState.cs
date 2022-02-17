@@ -12,11 +12,11 @@ public class ShuttleBuildingSatelliteState : IState<ShuttleBehavior>
     bool orbiting = false;
     Animator _animator;
 
-    TileUnderConstructionBehavior _underConstructionTile;
+    ConstructableBehavior _constructableBehavior;
 
-    public ShuttleBuildingSatelliteState(ShuttleBehavior parent, TileUnderConstructionBehavior tileUnderConstruction) : base(parent, false)
+    public ShuttleBuildingSatelliteState(ShuttleBehavior parent, ConstructableBehavior tileUnderConstruction) : base(parent, false)
     {
-        _underConstructionTile = tileUnderConstruction;
+        _constructableBehavior = tileUnderConstruction;
         Init();
     }
 
@@ -36,7 +36,7 @@ public class ShuttleBuildingSatelliteState : IState<ShuttleBehavior>
         orbiting = false;
 
         _animator = Parent.GetComponent<Animator>();
-        _underConstructionTile.OnConstructionCompleted.AddListener(OnConstructionCompleted);
+        _constructableBehavior.OnConstructionCompleted.AddListener(OnConstructionCompleted);
         Parent.OnShuttleDoorOpenedEvent += OnShuttleDoorOpened;
     }
 
@@ -44,9 +44,9 @@ public class ShuttleBuildingSatelliteState : IState<ShuttleBehavior>
     {
         Parent.OnShuttleDoorOpenedEvent -= OnShuttleDoorOpened;
         Parent.OnShuttleDoorClosedEvent += OnShuttleDoorClosed;
-        if (_underConstructionTile != null)
+        if (_constructableBehavior != null)
         {
-            _underConstructionTile.IsBuilding = true;
+            _constructableBehavior.IsBuilding = true;
         }
     }
 
@@ -65,8 +65,10 @@ public class ShuttleBuildingSatelliteState : IState<ShuttleBehavior>
     public void ReturnHome()
     {
         Parent.transform.parent = null;
-        if (_underConstructionTile != null)
-            _underConstructionTile.OnConstructionCompleted.RemoveListener(OnConstructionCompleted);
+        if (_constructableBehavior != null)
+        {
+            _constructableBehavior.OnConstructionCompleted.RemoveListener(OnConstructionCompleted);
+        }
         _animator.SetTrigger("CLOSE_DOOR");
         Parent.OnShuttleDoorClosedEvent += OnShuttleDoorClosed;
     }

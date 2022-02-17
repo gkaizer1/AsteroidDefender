@@ -12,6 +12,11 @@ public class ExplodeOnDeathBehavior : MonoBehaviour
         this.GetComponent<HealthBehavior>().OnHealthChanged.AddListener(OnHealthChanged);
     }
 
+    private void OnDestroy()
+    {
+        this.GetComponent<HealthBehavior>().OnHealthChanged.RemoveListener(OnHealthChanged);
+    }
+
     public void OnHealthChanged(float current, float max)
     {
         if (current > 0)

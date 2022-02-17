@@ -36,7 +36,11 @@ public class PolarCoordinateTransform : MonoBehaviour
         set
         {
             _Angle = value;
-            this.transform.rotation = Quaternion.Euler(0f, 0f, value);
+
+            // NOTE:: Polar coordinate should NOT rotate the object, only MOVE it
+            // Rotate object to match the current relative rotation
+            //this.transform.rotation = Quaternion.Euler(0f, 0f, value);
+
             UpdatePosition();
         }
         get
@@ -47,7 +51,7 @@ public class PolarCoordinateTransform : MonoBehaviour
 
     public void UpdatePosition()
     {
-        this.transform.position = Utils.ComputeCirclePosition(Angle, Radius);
+        this.transform.position = Utils.PolarToCartesian(Angle, Radius);
 
 #if UNITY_EDITOR
         _previousAngle = Angle;

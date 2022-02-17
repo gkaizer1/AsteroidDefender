@@ -30,6 +30,11 @@ public class SelectionManager : MonoBehaviour
         _instance = this;
     }
 
+    public void CancelSelection()
+    {
+        SelectedGameObject = null;
+    }
+
     public static GameObject SelectedGameObject
     {
         get

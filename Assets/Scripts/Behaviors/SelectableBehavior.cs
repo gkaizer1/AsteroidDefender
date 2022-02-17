@@ -5,9 +5,6 @@ using UnityEngine.Events;
 
 public class SelectableBehavior : MonoBehaviour
 {
-    [Header("UI")]
-    public GameObject selectionPanel;
-
     [Header("SelectionBehavior")]
     public bool IsSelectable = true;
 

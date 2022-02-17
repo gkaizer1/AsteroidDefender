@@ -4,6 +4,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
+public struct PolarCoodinates
+{
+    public float radius;
+    public float angle;
+}
+
 public static class Utils
 {
     public static float AngleToNearestValid(float angle, float radius)
@@ -23,11 +29,19 @@ public static class Utils
         return Mathf.Round((angle + degPerSatellite * count) / degPerSatellite) * (degPerSatellite);
     }
 
-    public static Vector3 ComputeCirclePosition(float angle, float radius)
+    public static Vector3 PolarToCartesian(float angle, float radius)
     {
         float x = Mathf.Cos(angle * Mathf.Deg2Rad) * radius;
         float y = Mathf.Sin(angle * Mathf.Deg2Rad) * radius;
         return new Vector3(x, y, 1f);
+    }
+    public static PolarCoodinates CartesianToPolar(Vector2 position)
+    {
+        return new PolarCoodinates()
+        {
+            radius = Mathf.Sqrt((position.x * position.x) + (position.y * position.y)),
+            angle = Mathf.Atan2(position.y, position.x)
+        };
     }
 
     public static bool IsOverUIElement()
