@@ -23,6 +23,7 @@ MonoBehaviour:
   - Popup - Drag Satellite
   - popup_sattelite_unlock
   - POPUP_BUILD_SATELLITE
+  - POPUP_UPGRADE_SATELLITE
   Popups:
   - {fileID: 11400000, guid: 255a282163ee5064ea8b93eb3f080caa, type: 2}
   - {fileID: 11400000, guid: 87bc05bb0a5b9604d9fa38e10d5dbaed, type: 2}
@@ -34,3 +35,4 @@ MonoBehaviour:
   - {fileID: 11400000, guid: d9b8ee7a670b78945b9b0bfc84224b8e, type: 2}
   - {fileID: 11400000, guid: a6242213954c1f44687fd5fd1b4f09d7, type: 2}
   - {fileID: 11400000, guid: cdc1696c435769c4694d69be0f9acc8e, type: 2}
+  - {fileID: 11400000, guid: 86a4051db3418d74e962bb763ed40213, type: 2}

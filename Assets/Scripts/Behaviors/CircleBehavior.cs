@@ -9,10 +9,12 @@ public class CircleBehavior : MonoBehaviour
     float _lastminAngle = 0.0f;
     float _lastAngle = 0.0f;
     float _lastRadius = 0f;
+    public float _lastmindRadius = -1.0f;
 
     [Range(0.0f, 500f)] 
     public float width = 1.0f;
     public Color color = Color.red;
+    public float startRadius = -1.0f;
     public float radius = 1.0f;
 
     [Range(-360.0f, 360)]
@@ -32,7 +34,7 @@ public class CircleBehavior : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (_lastAngle != MaxAngle || _lastRadius != radius || _lastminAngle != MinAngle)
+        if (_lastAngle != MaxAngle || _lastRadius != radius || _lastminAngle != MinAngle || _lastmindRadius!= startRadius)
             UpdateLine();
     }
     
@@ -41,11 +43,16 @@ public class CircleBehavior : MonoBehaviour
         List<Vector3> points = new List<Vector3>();
         Vector3 pos;
         float anglePerPoint = (MaxAngle - MinAngle) / (float)pointCount;
+        float r = radius;
         for (int i = 0; i <= pointCount; i++)
         {
             float angle = (MinAngle + anglePerPoint * i) * Mathf.Deg2Rad;
-            float x = radius * Mathf.Cos(angle);
-            float y = radius * Mathf.Sin(angle);
+            if(startRadius >= 0)
+            {
+                r = startRadius + ((radius - startRadius) / pointCount) * i;
+            }
+            float x = r * Mathf.Cos(angle);
+            float y = r * Mathf.Sin(angle);
             pos = new Vector3(x, y, 0);
             points.Add(pos);
         }
@@ -61,5 +68,6 @@ public class CircleBehavior : MonoBehaviour
         _lastAngle = MaxAngle;
         _lastRadius = radius;
         _lastminAngle = MinAngle;
+        _lastmindRadius = startRadius;
     }
 }

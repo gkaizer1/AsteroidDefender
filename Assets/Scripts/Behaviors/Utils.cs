@@ -8,6 +8,11 @@ public struct PolarCoodinates
 {
     public float radius;
     public float angle;
+
+    public override string ToString()
+    {
+        return $"Angle={angle}, Radius={radius}";
+    }
 }
 
 public static class Utils
@@ -37,15 +42,23 @@ public static class Utils
     }
     public static PolarCoodinates CartesianToPolar(Vector2 position)
     {
+        float angle = (Mathf.Rad2Deg * Mathf.Atan2(position.y, position.x)) % 360.0f;
+        if(angle < 0)
+        {
+            angle = angle + 360.0f;
+        }
+
         return new PolarCoodinates()
         {
             radius = Mathf.Sqrt((position.x * position.x) + (position.y * position.y)),
-            angle = Mathf.Atan2(position.y, position.x)
+            angle = angle
         };
     }
 
     public static bool IsOverUIElement()
     {
+        List<GameObject> objectsToIgnore = ClickHandler.Instance?.UI_OBJECTS_TO_IGNORE ?? new List<GameObject>(); ;
+
         if (EventSystem.current.IsPointerOverGameObject())
         {
             PointerEventData pointer = new PointerEventData(EventSystem.current);
@@ -58,12 +71,11 @@ public static class Utils
             {
                 foreach (var go in raycastResults)
                 {
+                    if (objectsToIgnore?.Contains(go.gameObject) ?? false)
+                        continue;
+
                     if (go.gameObject.GetComponent<UnityEngine.UI.Button>() != null)
                         return true;
-
-                    if (go.gameObject.GetComponent<Canvas>() != null ||
-                        go.gameObject.GetComponent<CanvasRenderer>() != null)
-                        continue;
 
                     return true;
                 }

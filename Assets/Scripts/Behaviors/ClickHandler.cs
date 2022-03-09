@@ -16,11 +16,14 @@ public interface IScreenClickedHandler
 
 public class ClickHandler : MonoBehaviour
 {
+    public List<GameObject> UI_OBJECTS_TO_IGNORE = new List<GameObject>();
     Vector3 _mouseStart = Vector3.zero;
     public Cinemachine.CinemachineVirtualCamera zoomCamera;
+    public static ClickHandler Instance;
 
     private void Awake()
     {
+        Instance = this;
         SelectionManager.OnSelected += OnSelectionChanged;
     }
 

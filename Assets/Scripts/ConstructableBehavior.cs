@@ -6,6 +6,7 @@ using UnityEngine.Events;
 public class ConstructableBehavior : MonoBehaviour
 {
     public UnityEvent<GameObject> OnConstructionCompleted;
+    public UnityEvent<float> OnConstructionStatusChanged;
 
     public GameObject ObjectToConstructPrefab;
 
@@ -38,6 +39,11 @@ public class ConstructableBehavior : MonoBehaviour
 
             if (gameObject != null)
                 Destroy(gameObject);
+        }
+        else
+        {
+            // Notify Precentage Changed
+            OnConstructionStatusChanged?.Invoke(1.0f - _elapsedTime / constructionTime);
         }
     }
 }

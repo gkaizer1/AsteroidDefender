@@ -1,27 +1,69 @@
 using DG.Tweening;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
+[Serializable]
+public class WeaponSlot
+{
+    public bool UnderConstruction = false;
+    public Transform transform;
+    public WeaponBehavior equipedWeapon;
+    private GameObject weaponInstance;
+
+    public void AddWeapon(GameObject weaponPrefab)
+    {
+        if (UnderConstruction)
+            return;
+
+        UnderConstruction = true;
+
+        // Remove the existing weapon first
+        RemoveWeapon();
+
+        ShuttleMission_UpgradeSatellite mission = new ShuttleMission_UpgradeSatellite(this.transform.gameObject, 
+            new BuildUpgradeInfo()
+            {
+                OnBuildCompleted = () =>
+                {
+                    weaponInstance = GameObject.Instantiate(weaponPrefab, transform);
+                    equipedWeapon = weaponInstance.GetComponent<WeaponBehavior>();
+                    UnderConstruction = false;
+                }
+            });
+        ShuttleMissionManager.Instance.ScheduleMission(mission);
+    }
+
+    public void RemoveWeapon()
+    {
+        if (weaponInstance != null)
+        {
+            GameObject.Destroy(weaponInstance);
+            weaponInstance = null;
+        }
+    }
+}
+
 #if UNITY_EDITOR
-//[ExecuteAlways]
+[ExecuteAlways]
 #endif
 public class SatelliteBehavior : MonoBehaviour
 {
+    private Animator _animator;
     public static event System.Action OnSatelliteMoved;
 
-    public LineRenderer verticalLine;
     public GameObject turnRadiusIndicator;
     public DragableBehavior rotatorHandle;
-    public float rotationSpeed = 5f;
     public float minAltitude = 11.0f;
+    public float moveSpeed = 5.0f;
+    public float bodyRotationAnglePerSecond = 90.0f;
 
     public GameObject endTurnIndicator;
     GameObject _endTurnIndicatorInstance;
     BoxCollider2D _boxCollider2D;
 
-    public GameObject exhaust;
     public GameObject body;
 
     public GameObject movePrefabSatellite;
@@ -36,10 +78,15 @@ public class SatelliteBehavior : MonoBehaviour
     public UnityEvent<SatelliteBehavior> OnMoveEnded;
 
     public bool IsRelocating = false;
+    public bool CanMove = true;
+
+    public List<WeaponSlot> WeaponSockets = new List<WeaponSlot>();
 
     // Start is called before the first frame update
     void Start()
     {
+        _animator = GetComponent<Animator>();
+
         _polarTransform = GetComponent<PolarCoordinateTransform>();
         if (_polarTransform == null)
             gameObject.UnassignedReference($"Satellite missing polar transform component");
@@ -59,20 +106,24 @@ public class SatelliteBehavior : MonoBehaviour
             {
                 this.transform.parent = container.transform;
                 if (turnRadiusIndicator != null)
+                {
                     turnRadiusIndicator.transform.parent = container.transform;
+                    turnRadiusIndicator.transform.position = Vector3.zero;
+                }
             }
+            if (turnRadiusIndicator != null)
+            {
+                turnRadiusIndicator.GetComponent<CircleBehavior>().radius = 0.0f;
+                turnRadiusIndicator.GetComponent<CircleBehavior>().MinAngle = 0;
+                turnRadiusIndicator.GetComponent<CircleBehavior>().MaxAngle = 0;
+                turnRadiusIndicator.SetActive(false);
+            }
+
+            if(!IsValidLocation(this._polarTransform.Radius, this._polarTransform.Angle))
+                MoveToNextLegalLocation();
 #if UNITY_EDITOR
         }
 #endif
-        if (turnRadiusIndicator != null)
-        {
-            turnRadiusIndicator.GetComponent<CircleBehavior>().radius = 0.0f;
-            turnRadiusIndicator.GetComponent<CircleBehavior>().MinAngle = 0;
-            turnRadiusIndicator.GetComponent<CircleBehavior>().MaxAngle = 0;
-            turnRadiusIndicator.SetActive(false);
-        }
-
-        MoveToNextLegalLocation();
     }
 
     private void OnDestroy()
@@ -111,17 +162,6 @@ public class SatelliteBehavior : MonoBehaviour
             turnRadiusIndicator.GetComponent<CircleBehavior>().MinAngle = _polarTransform.Angle;
             turnRadiusIndicator.GetComponent<CircleBehavior>().MaxAngle = _polarTransform.Angle;
         }
-
-        if (verticalLine != null)
-        {
-            verticalLine.enabled = true;
-            verticalLine.positionCount = 2;
-            verticalLine.SetPositions(new Vector3[2]
-            {
-                Utils.PolarToCartesian(_polarTransform.Angle, _polarTransform.Radius),
-                Utils.PolarToCartesian(_polarTransform.Angle, _polarTransform.Radius)
-            });
-        }
     }
 
     bool _previousMoveValid = true;
@@ -149,6 +189,8 @@ public class SatelliteBehavior : MonoBehaviour
                 _dragRadiusEnd -= 2;
         }
 
+        _dragRadiusEnd = Mathf.Floor(_dragRadiusEnd);
+
         if (_dragRadiusEnd < minAltitude)
             _dragRadiusEnd = minAltitude;
 
@@ -161,21 +203,14 @@ public class SatelliteBehavior : MonoBehaviour
         turnRadiusIndicator.GetComponent<CircleBehavior>().MinAngle = _polarTransform.Angle;
         turnRadiusIndicator.GetComponent<CircleBehavior>().MaxAngle = _dragAngleEnd;
         turnRadiusIndicator.GetComponent<CircleBehavior>().radius = _dragRadiusEnd;
+        turnRadiusIndicator.GetComponent<CircleBehavior>().startRadius = _polarTransform.Radius;
 
         _movePrefabInstance.GetComponent<PolarCoordinateTransform>().Radius = _dragRadiusEnd;
         _movePrefabInstance.GetComponent<PolarCoordinateTransform>().Angle = _dragAngleEnd;
         _movePrefabInstance.transform.rotation = Quaternion.Euler(0f, 0f, _dragAngleEnd);
 
-        verticalLine.positionCount = 2;
-        verticalLine.SetPositions(new Vector3[2]
-        {
-            Utils.PolarToCartesian(_polarTransform.Angle, _polarTransform.Radius),
-            Utils.PolarToCartesian(_polarTransform.Angle, _dragRadiusEnd)
-        });
-
-
         _movePrefabInstance.transform.rotation = Quaternion.Euler(0f, 0f, _dragAngleEnd);
-        _movePrefabInstance.transform.localRotation = Quaternion.Euler(0f, 0f, _dragAngleEnd - 90.0f);
+        _movePrefabInstance.transform.localRotation = Quaternion.Euler(0f, 0f, _dragAngleEnd);
         if (!IsValidLocation(_dragRadiusEnd, _dragAngleEnd))
         {
             if (_previousMoveValid)
@@ -203,7 +238,6 @@ public class SatelliteBehavior : MonoBehaviour
 
     }
 
-
     public void OnMouseDragEnd(GameObject sender, Vector3 start, Vector3 end)
     {
         foreach (var autoAimBehavior in this.GetComponentsInChildren<AutoAimBehavior>())
@@ -219,7 +253,6 @@ public class SatelliteBehavior : MonoBehaviour
         if (!IsValidLocation(_dragRadiusEnd, _dragAngleEnd))
         {
             turnRadiusIndicator.SetActive(false);
-            verticalLine.enabled = false;
             return;
         }
 
@@ -239,7 +272,7 @@ public class SatelliteBehavior : MonoBehaviour
         // Round down radius in increment of 5 (e.g radis 17 -> 15, 23 -> 20, etc.)
         radius = radius - (radius % 7.0f);
         float degPerGameUnit = 360.0f / (2.0f * radius * Mathf.PI);
-        float degPerSatellite = 1.5f * degPerGameUnit;
+        float degPerSatellite = 0.5f * degPerGameUnit;
 
         // Get an integer multiplier
         return Mathf.Round(angle / degPerSatellite) * degPerSatellite;
@@ -250,53 +283,41 @@ public class SatelliteBehavior : MonoBehaviour
         // Round down radius in increment of 5 (e.g radis 17 -> 15, 23 -> 20, etc.)
         float radius = _polarTransform.Radius - (_polarTransform.Radius % 7.0f);
         float degPerGameUnit = 360.0f / (2.0f * radius * Mathf.PI);
-        float degPerSatellite = 1.5f * degPerGameUnit;
+        float degPerSatellite = 0.5f * degPerGameUnit;
         float offset = degPerSatellite * count;
 
         // Get an integer multiplier
         return Mathf.Round((angle + offset) / degPerSatellite) * (degPerSatellite);
     }
 
-    Tweener _exhaustTween;
+    System.Action _onExhaustChanged;
+    bool isExhuastOn = false;
     public void ToggleExhaust(bool exhuastOn, System.Action onCompleted = null)
     {
-        // If there is an exhuast tween playing --- stop, before doing anything
-        if(_exhaustTween != null && _exhaustTween.IsPlaying())
-        {
-            _exhaustTween.Kill();
-            _exhaustTween = null;
-        }
+        if (isExhuastOn == exhuastOn)
+            return;
 
-        if (exhuastOn)
-        {
-            exhaust.SetActive(true);
-            _exhaustTween = exhaust.transform.DOScaleY(1.0f, 0.5f)
-                .OnComplete(() => onCompleted?.Invoke())
-                .OnKill(()=> _exhaustTween = null);
-        }
-        else
-        {
-            _exhaustTween = exhaust.transform.DOScaleY(0.0f, 0.5f)
-                .OnComplete(() =>
-                {
-                    exhaust.SetActive(false);
-                    onCompleted?.Invoke();
-                    _exhaustTween = null;
-                })
-                .OnKill(() => _exhaustTween = null);
-        }
-
+        isExhuastOn = exhuastOn;
+        _animator?.Play(exhuastOn ? "exhaust_on" : "exhaust_off");
+        _onExhaustChanged = onCompleted;
     }
 
-    public void MoveSatellite(float radius, float angle, System.Action OnMoveCompleted = null)
+    public void OnExhaustedChanged()
     {
-        if (this.IsRelocating)
-            return;
-        this.IsRelocating = true;
+        _onExhaustChanged?.Invoke();
+        _onExhaustChanged = null;
+    }
 
+    Vector3 _nextCheckpoint = Vector3.zero;
+    public void MoveSatellite(float endRadius, float endAngle, System.Action OnMoveCompleted = null)
+    {
+        if (this.IsRelocating || !this.CanMove)
+            return;
+
+        this.IsRelocating = true;
         OnMoveStarted?.Invoke(this);
 
-        float endAngle = AngleToNearestValid(angle, radius);
+        endAngle = AngleToNearestValid(endAngle, endRadius);
 
         if (_endTurnIndicatorInstance != null)
         {
@@ -308,125 +329,101 @@ public class SatelliteBehavior : MonoBehaviour
         if (_endTurnIndicatorInstance == null)            
             _endTurnIndicatorInstance = Instantiate(this.endTurnIndicator, this.transform.parent);            
 
-        _endTurnIndicatorInstance.transform.position = Utils.PolarToCartesian(endAngle, radius);
+        _endTurnIndicatorInstance.transform.position = Utils.PolarToCartesian(endAngle, endRadius);
         _endTurnIndicatorInstance.transform.rotation = Quaternion.Euler(0f, 0f, endAngle);
-        _endTurnIndicatorInstance.transform.localRotation = Quaternion.Euler(0f, 0f, endAngle - 90.0f);        
+        _endTurnIndicatorInstance.transform.localRotation = Quaternion.Euler(0f, 0f, 180.0f + endAngle);        
 
-        float distance = (radius * 2f * Mathf.PI) * (Mathf.Abs(_polarTransform.Angle - endAngle) / 360f);
-        float rotationTime = distance / rotationSpeed;
 
-        float rotationDelta = _polarTransform.Angle - endAngle;
-        System.Action doHorizontalMove = () =>
+        if (turnRadiusIndicator)
         {
-            // 1. Rotate the body to the right orientation
-            // 2. Start moving !
-            float rotationDirection = rotationDelta <= 0 ? 180f : 0f;
-            if(Mathf.Abs(rotationDelta) < 0.1f)
+            turnRadiusIndicator.GetComponent<CircleBehavior>().radius = endRadius;
+            turnRadiusIndicator.GetComponent<CircleBehavior>().MinAngle = _polarTransform.Angle;
+            turnRadiusIndicator.GetComponent<CircleBehavior>().MaxAngle = endAngle;
+            turnRadiusIndicator.SetActive(true);
+        }
+
+        float rotationDelta = endAngle - _polarTransform.Angle;
+        float radiusDelta = endRadius - _polarTransform.Radius;
+
+        float distance = (endRadius * 2f * Mathf.PI) * (Mathf.Abs(rotationDelta) / 360f);
+        float rotationTime = (distance / moveSpeed) + Mathf.Abs(radiusDelta);
+
+        // 1. Rotate the body to the right orientation
+        // 2. Start moving !
+        float rotationDirection = rotationDelta <= 0 ? 180f : 0f;
+        float angleDelta = Mathf.DeltaAngle(this.body.transform.rotation.eulerAngles.z, _polarTransform.Angle + rotationDirection);
+        float timeToRotate = Mathf.Abs(angleDelta / 180.0f * 2.0f) + (radiusDelta * 2.0f);
+
+        _nextCheckpoint = Utils.PolarToCartesian(
+            this._polarTransform.Angle + (0.1f * rotationDelta), 
+            this._polarTransform.Radius + (0.1f * radiusDelta));
+        float bodyAngleDelta = Vector3.SignedAngle(this.transform.up, this.transform.position - _nextCheckpoint, Vector3.forward);
+
+        float bodyRotationDelta = Mathf.DeltaAngle(this.body.transform.rotation.eulerAngles.z, bodyAngleDelta);
+        float bodyRotationTime = Mathf.Abs(bodyRotationDelta) / bodyRotationAnglePerSecond;
+        this.body.transform.DORotate(new Vector3(0, 0, bodyAngleDelta), bodyRotationTime)
+            .OnStart(() =>
             {
-                this._polarTransform.Angle = endAngle;
-                OnMoved();
-                OnMoveCompleted?.Invoke();
-                return;
-            }
+                turnRadiusIndicator.GetComponent<CircleBehavior>().MinAngle = _polarTransform.Angle;
+                turnRadiusIndicator.GetComponent<CircleBehavior>().MaxAngle = endAngle;
 
-            float angleDelta = Mathf.DeltaAngle(this.body.transform.rotation.eulerAngles.z, _polarTransform.Angle + rotationDirection);
-            float timeToRotate = Mathf.Abs(angleDelta / 180.0f) * 2.0f;
-            this.body.transform.DOLocalRotate(new Vector3(0, 0, _polarTransform.Angle + rotationDirection), timeToRotate)
-                .OnStart(() =>
-                {
-                    turnRadiusIndicator.GetComponent<CircleBehavior>().MinAngle = _polarTransform.Angle;
-                    turnRadiusIndicator.GetComponent<CircleBehavior>().MaxAngle = endAngle;
-                    turnRadiusIndicator.SetActive(true);
-                    ToggleExhaust(false);
-                })
-                .OnComplete(() =>
-                {
-                    ToggleExhaust(true, 
-                        // After exhaust has been turned on
-                        // Only then start moving
-                        () =>
+                turnRadiusIndicator.GetComponent<CircleBehavior>().startRadius = _polarTransform.Radius;
+                turnRadiusIndicator.GetComponent<CircleBehavior>().radius = endRadius;
+                turnRadiusIndicator.SetActive(true);
+                ToggleExhaust(false);
+            })
+            .OnComplete(() =>
+            {
+                ToggleExhaust(true, 
+                    // After exhaust has been turned on
+                    // Only then start moving
+                    () =>
+                    {
+                        float currentPrecentage = 0.0f;
+                        float startAngle = _polarTransform.Angle;
+                        float startRadius = _polarTransform.Radius;
+
+                        DOTween.To( () => currentPrecentage,
+                                    x => currentPrecentage = x,
+                                    1.0f,
+                                    rotationTime)
+                        .OnUpdate(() =>
                         {
-                            DOTween.To(() => this._polarTransform.Angle,
-                                    x => _polarTransform.Angle = x,
-                                    endAngle,
-                                    rotationTime * 5.0f)
-                                .OnUpdate(() =>
-                                {
-                                    turnRadiusIndicator.GetComponent<CircleBehavior>().MinAngle = _polarTransform.Angle;
-                                    this.body.transform.rotation = Quaternion.Euler(0f, 0f, _polarTransform.Angle + rotationDirection);
-                                })
-                                .OnStart(() =>
-                                {
-                                })
-                                .OnComplete(() =>
-                                {
-                                    // Disabled - since the body should be in the correct position by this point
-                                    // Reset rotation to proper horizontal angle
-                                    // body.transform.localRotation = Quaternion.Euler(0, 0, 0.0f);
+                            _polarTransform.Angle = startAngle + (currentPrecentage * rotationDelta);
+                            _polarTransform.Radius = startRadius + (currentPrecentage * radiusDelta);
+                            turnRadiusIndicator.GetComponent<CircleBehavior>().MinAngle = _polarTransform.Angle;
+                            turnRadiusIndicator.GetComponent<CircleBehavior>().startRadius = _polarTransform.Radius;
 
-                                    OnMoved();
-                                    OnMoveCompleted?.Invoke();
-                                });
+                            // Keep adjusting the body to the next checkpoint
+                            _nextCheckpoint = Utils.PolarToCartesian(
+                                this._polarTransform.Angle + (0.1f * rotationDelta),
+                                this._polarTransform.Radius + (0.1f * radiusDelta));
+                            float bodyAngleDelta = Vector3.SignedAngle(this.transform.up, this.transform.position - _nextCheckpoint, Vector3.forward);
+                            this.body.transform.rotation = Quaternion.Euler(0, 0, bodyAngleDelta);
+                        })
+                        .OnStart(() =>
+                        {
+                        })
+                        .OnComplete(() =>
+                        {
+                            // Disabled - since the body should be in the correct position by this point
+                            // Reset rotation to proper horizontal angle
+                            // body.transform.localRotation = Quaternion.Euler(0, 0, 0.0f);
+
+                            OnMoved();
+                            OnMoveCompleted?.Invoke();
                         });
-                });
-        };
-
-        if (_polarTransform.Radius != radius)
-        {
-            float orbitdelta = _polarTransform.Radius - radius;
-            float currentRotation = this.body.transform.rotation.eulerAngles.z;
-            float finalAngle = this._polarTransform.Angle + (orbitdelta > 0 ? -90f : 90f);
-            float timeToNormalize = Mathf.Abs((finalAngle - currentRotation) / 180.0f) * 2.0f;
-
-            // 1. Rotate body to start movment
-            // 2. Do vertical movment
-            // 3. Execute horizontal movment
-            this.body.transform.DOLocalRotate(new Vector3(0, 0, finalAngle), timeToNormalize)
-                .OnStart(() =>
-                {
-                    ToggleExhaust(false);
-                })
-                .OnComplete(() =>
-                {
-                    ToggleExhaust(true);
-
-                    float increaseOrbitTime = Mathf.Abs(orbitdelta) / rotationSpeed;
-                    DOTween.To(() => this._polarTransform.Radius,
-                                    x => _polarTransform.Radius = x,
-                                    radius,
-                                    increaseOrbitTime * 5.0f)
-                                .OnComplete(() =>
-                                {
-                                    verticalLine.enabled = false;
-
-                                    // Move horizontally
-                                    doHorizontalMove();
-                                })
-                                .OnUpdate(() =>
-                                {
-                                    verticalLine.SetPositions(new Vector3[2]
-                                    {
-                                        Utils.PolarToCartesian(_polarTransform.Angle, _polarTransform.Radius),
-                                        Utils.PolarToCartesian(_polarTransform.Angle, radius)
-                                    });
-                                });
-                });
-
-            
-        }
-        else
-        {
-            // Just move horizontally
-            doHorizontalMove();
-        }
+                    });
+            });
     }
 
     void RotateToStationary(System.Action onRotationCompelted = null)
     {
         float currentRotation = this.body.transform.rotation.eulerAngles.z;
-        float finalAngle = this._polarTransform.Angle + 90.0f;
-        float timeToNormalize = Mathf.Abs((finalAngle - currentRotation) / 180.0f) * 2.0f;
-        this.body.transform.DOLocalRotate(new Vector3(0, 0, finalAngle), timeToNormalize).OnComplete(() =>
+        float finalAngle = this._polarTransform.Angle;
+        float bodyRotationDelta = Mathf.DeltaAngle(this.body.transform.rotation.eulerAngles.z, finalAngle);
+        float bodyRotationTime = Mathf.Abs(bodyRotationDelta) / bodyRotationAnglePerSecond;
+        this.body.transform.DOLocalRotate(new Vector3(0, 0, finalAngle), bodyRotationTime).OnComplete(() =>
         {
             onRotationCompelted?.Invoke();
             OnMoveEnded?.Invoke(this);
@@ -447,7 +444,6 @@ public class SatelliteBehavior : MonoBehaviour
             OnSatelliteMoved?.Invoke();
         });
 
-        verticalLine.enabled = false;
         if (turnRadiusIndicator != null)
             turnRadiusIndicator.SetActive(false);
 
@@ -543,11 +539,29 @@ public class SatelliteBehavior : MonoBehaviour
     }
 
     private void OnDrawGizmos()
-    {
-        for(int i = 0; i < 360; i += 10)
-        {
-            float angle = AngleToNearestValid(i, this._polarTransform.Radius);
-            Gizmos.DrawCube(Utils.PolarToCartesian(angle, this._polarTransform.Radius), new Vector3(1, 1, 1));
-        }
+    {        
+        Gizmos.DrawCube(_nextCheckpoint, new Vector3(0.2f, 0.2f, 1));
+        //for (int i = 0; i < 360; i += 10)
+        //{
+        //    float angle = AngleToNearestValid(i, this._polarTransform.Radius);
+        //    Gizmos.DrawCube(Utils.PolarToCartesian(angle, this._polarTransform.Radius), new Vector3(1, 1, 1));
+        //}
     }
+
+#if UNITY_EDITOR
+    [Header("Editor ONLY")]
+    public bool _MOVE_TO_NEAREST = false;
+    public void OnValidate()
+    {
+        if (_MOVE_TO_NEAREST)
+        {
+            _MOVE_TO_NEAREST = false;
+            float angle = AngleToNearestValid(this._polarTransform.Angle, this._polarTransform.Radius);
+            this._polarTransform.Angle = angle;
+
+            float finalAngle = this._polarTransform.Angle;
+            this.body.transform.localRotation = Quaternion.Euler(new Vector3(0, 0, finalAngle));
+        }        
+    }
+#endif
 }

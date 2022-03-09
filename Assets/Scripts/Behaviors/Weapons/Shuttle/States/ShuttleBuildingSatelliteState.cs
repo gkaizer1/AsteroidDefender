@@ -37,17 +37,14 @@ public class ShuttleBuildingSatelliteState : IState<ShuttleBehavior>
 
         _animator = Parent.GetComponent<Animator>();
         _constructableBehavior.OnConstructionCompleted.AddListener(OnConstructionCompleted);
-        Parent.OnShuttleDoorOpenedEvent += OnShuttleDoorOpened;
-    }
-
-    private void OnShuttleDoorOpened()
-    {
-        Parent.OnShuttleDoorOpenedEvent -= OnShuttleDoorOpened;
-        Parent.OnShuttleDoorClosedEvent += OnShuttleDoorClosed;
-        if (_constructableBehavior != null)
+        Parent.OnShuttleDoorOpenedEvent += () =>
         {
-            _constructableBehavior.IsBuilding = true;
-        }
+            if (_constructableBehavior != null)
+            {
+                _constructableBehavior.IsBuilding = true;
+            }
+        };
+        Parent.OnShuttleDoorClosedEvent += OnShuttleDoorClosed;
     }
 
     public void OnConstructionCompleted(GameObject newTile)
@@ -81,12 +78,6 @@ public class ShuttleBuildingSatelliteState : IState<ShuttleBehavior>
     public override IState<ShuttleBehavior> Update()
     {
         base.Update();
-
-        //if (Parent.target == null)
-        //{
-        //    Parent.transform.parent = null;
-        //    return Parent.CreateReturnBackToBaseState();
-        //}
 
         if (orbiting)
         {

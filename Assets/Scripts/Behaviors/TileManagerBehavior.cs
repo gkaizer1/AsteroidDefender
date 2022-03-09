@@ -40,6 +40,7 @@ public class TileManagerBehavior : MonoBehaviour
 
     public bool Recompute = false;
     public bool GenerateGrid = false;
+    public bool Clear = false;
 
     private void Awake()
     {
@@ -110,6 +111,8 @@ public class TileManagerBehavior : MonoBehaviour
             prefab = prefab,
             name = name
         });
+
+#if !UNITY_EDITOR
         Doozy.Engine.GameEventMessage.SendEvent("TILE_ADDED");
         var tileBehavior = newTile.GetComponent<TileBehavior>();
         if (tileBehavior != null)
@@ -117,6 +120,7 @@ public class TileManagerBehavior : MonoBehaviour
             tileBehavior.TileManager = this;
             Doozy.Engine.GameEventMessage.SendEvent($"TILE_ADDED_{tileBehavior.tileType}");
         }
+#endif
 
         return newTile;
     }
@@ -149,13 +153,24 @@ public class TileManagerBehavior : MonoBehaviour
         return tiles.Find(x => x.tileInstance == tile);
     }
 
+
+#if UNITY_EDITOR
     public void Update()
     {
+        if(Clear)
+        {
+            Clear = false;
+            foreach (var tile in tiles)
+                DestroyImmediate(tile.tileInstance, true);
+            tiles.Clear();
+        }
+
         if(Recompute)
         {
             Recompute = false;
-            for (int i = this.transform.childCount; i > 0; --i)
-                DestroyImmediate(this.transform.GetChild(0).gameObject, true);
+            foreach(var tile in tiles)
+                DestroyImmediate(tile.tileInstance, true);
+            tiles.Clear();
 
             var tilesCopy = new List<TileInfo>();
             tilesCopy.AddRange(tiles);
@@ -166,6 +181,7 @@ public class TileManagerBehavior : MonoBehaviour
 
             if (GenerateGrid)
             {
+                GenerateGrid = false;
                 for (float row = -(rows / 2); row < Mathf.Ceil((float)rows / 2.0f); row++)
                 {
                     for (float col = -(columns / 2); col < Mathf.Ceil((float)columns / 2.0f); col++)
@@ -173,9 +189,8 @@ public class TileManagerBehavior : MonoBehaviour
                         AddTile(row, col, emptyTile);
                     }
                 }
-                GenerateGrid = false;
             }
-
         }
     }
+#endif
 }

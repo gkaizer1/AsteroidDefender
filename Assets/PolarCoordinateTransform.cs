@@ -10,6 +10,7 @@ public class PolarCoordinateTransform : MonoBehaviour
 #if UNITY_EDITOR
     float _previousAngle;
     float _previousRadius;
+    Vector3 _previousCoordinate;
 #endif
 
     [Range(0, 120)]
@@ -56,17 +57,28 @@ public class PolarCoordinateTransform : MonoBehaviour
 #if UNITY_EDITOR
         _previousAngle = Angle;
         _previousRadius = Radius;
+        _previousCoordinate = this.transform.position;
 #endif
     }
 
 #if UNITY_EDITOR
     void Update()
     {
+        if ((this.transform.position - _previousCoordinate).magnitude > 0.1f)
+        {
+            var coordinates = Utils.CartesianToPolar(this.transform.position);
+            _Angle = coordinates.angle;
+            _Radius = coordinates.radius;
+            UpdatePosition();
+            return;
+        }
+
         if (this._Radius != _previousRadius || this._Angle != _previousAngle)
         {
             _previousAngle = _Angle;
             _previousRadius = _Radius;
             UpdatePosition();
+            return;
         }
     }
 #endif

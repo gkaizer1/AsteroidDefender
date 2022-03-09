@@ -53,18 +53,18 @@ public class EnemySpawningBehavior<T> : IState<T>
          */
         SpriteRenderer spriteRender = Parent.GetComponent<SpriteRenderer>();
         spriteRender.color = new Color(spriteRender.color.r, spriteRender.color.g, spriteRender.color.b, 0.0f);
-        spriteRender.DOFade(1.0f, 1.0f);
+        spriteRender.DOFade(1.0f, 2.0f);
 
         _onSpawnStarted?.Invoke();
     }
 
-    public IState<T> OnSpawnCompleted(OnSpawnCompletedDelegate callback)
+    public EnemySpawningBehavior<T> OnSpawnCompleted(OnSpawnCompletedDelegate callback)
     {
         _onSpawned = callback;
         return this;
     }
 
-    public IState<T> OnSpawnStarted(System.Action callback)
+    public EnemySpawningBehavior<T> OnSpawnStarted(System.Action callback)
     {
         _onSpawnStarted = callback;
         return this;

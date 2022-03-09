@@ -24,11 +24,6 @@ public class SpaceShipBehavior : MonoBehaviour
 
     StateManager<SpaceShipBehavior> _stateManager = null;
 
-    private void Awake()
-    {
-        GetComponent<SpriteRenderer>().maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
-    }
-
     void Start()
     {
         _returnPoint = this.transform.position;

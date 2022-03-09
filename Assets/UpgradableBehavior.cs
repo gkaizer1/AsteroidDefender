@@ -3,36 +3,39 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using System.Linq;
+
+[System.Serializable]
+public enum Upgrades
+{
+    VULCAN_CANNON_2 = 0,
+    VULCAN_CANNON_3 = 1,
+    VULCAN_AMMO_BOX = 2,
+    VULCAN_AMMO = 3,
+    VULCAN_RADAR = 4,
+    LASER_HEAT_SINK = 5,
+    LASER_CAMERA = 6,
+    LASER_BATTERY = 7,
+    LASER_RADAR = 8,
+    MISSLE_POD_2 = 9,
+    MISSLE_POD_3 = 10,
+    MISSLE_LEVEL_2 = 11,
+    MISSLE_LEVEL_3 = 12,
+    MISSLE_RADAR = 13,
+    UNKNOWN = -1
+};
 
 [System.Serializable]
 public class UpgradableEvent
 {
     public string UIEvent;
-    public UpgradableBehavior.Upgrades upgrade;
+    public Upgrades upgrade;
     public UnityEvent callbacks;
-    public List<UpgradableBehavior.Upgrades> requiredUpgrades;
+    public List<Upgrades> requiredUpgrades;
 }
 
 public class UpgradableBehavior : MonoBehaviour
 {
-    public enum Upgrades
-    {
-        VULCAN_CANNON_2,
-        VULCAN_CANNON_3,
-        VULCAN_AMMO_BOX,
-        VULCAN_AMMO,
-        VULCAN_RADAR,
-        LASER_HEAT_SINK,
-        LASER_CAMERA,
-        LASER_BATTERY,
-        LASER_RADAR,
-        MISSLE_POD_2,
-        MISSLE_POD_3,
-        MISSLE_LEVEL_2,
-        MISSLE_LEVEL_3,
-        MISSLE_RADAR,
-        UNKNOWN
-    };
 
     public List<UpgradableEvent> upgrades = new List<UpgradableEvent>();
 
@@ -49,6 +52,17 @@ public class UpgradableBehavior : MonoBehaviour
     public void OnDestroy()
     {
         GameEventMessage.RemoveListener<GameEventMessage>(OnMessage);
+    }
+
+    public void UnlockUpgrade(Upgrades upgrade)
+    {
+        this.activeUpgrades.Add(upgrade);
+
+        upgrades.Where(x => x.upgrade == upgrade).ToList().ForEach(x =>
+        {
+            x.callbacks?.Invoke();
+        });
+        OnUpgradeUnlocked?.Invoke(upgrade);
     }
 
     private void OnMessage(GameEventMessage message)

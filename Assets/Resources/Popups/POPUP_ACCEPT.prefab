@@ -526,7 +526,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: a50e72b59b2889e438af4c01bed12c20, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 1721ddfa620c9c94c9a4d492597f4aee, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -2970,6 +2970,7 @@ MonoBehaviour:
     PresetName: 
   TargetLabel: 1
   TextLabel: {fileID: 2862630000772292661}
+  TextMeshProLabel: {fileID: 0}
 --- !u!114 &4708229413387381457
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5565,6 +5566,7 @@ MonoBehaviour:
     PresetName: 
   TargetLabel: 1
   TextLabel: {fileID: 1817356993555174598}
+  TextMeshProLabel: {fileID: 0}
 --- !u!114 &3660723445836920364
 MonoBehaviour:
   m_ObjectHideFlags: 0

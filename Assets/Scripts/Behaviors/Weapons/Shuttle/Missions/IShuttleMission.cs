@@ -2,6 +2,6 @@
 
 public interface IShuttleMission
 {
-    bool MissionAccepted { get; }
+    bool MissionAccepted { get; set; }
     IState<ShuttleBehavior> StartMission(ShuttleBehavior shuttle);
 }

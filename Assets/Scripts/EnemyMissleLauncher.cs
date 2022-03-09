@@ -31,7 +31,13 @@ public class EnemyMissleLauncher : MonoBehaviour
             .Fire()
             .OnExplosion(explosionPoint =>
             {
-                GameObject.FindGameObjectWithTag("earth").GetComponent<HealthBehavior>().Health -= MissleDamage;
+                var intersections = Physics2D.OverlapCircleAll(explosionPoint, 0.2f);
+                foreach(var obj in intersections)
+                {
+                    var healthBehavior = obj.GetComponent<HealthBehavior>();
+                    if (healthBehavior != null)
+                        healthBehavior.Health -= MissleDamage;
+                }
                 Destroy(attackTarget);
             });
     }

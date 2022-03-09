@@ -125,7 +125,8 @@ public class ZoomBehavior : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0) && !_panning && !_cameraLocked)
         {
-            BeginPan();
+            if(!Utils.IsOverUIElement())
+                BeginPan();
         }
 
         if (Input.GetMouseButtonUp(0) && _panning)
@@ -165,7 +166,8 @@ public class ZoomBehavior : MonoBehaviour
             if (touch.phase == TouchPhase.Began)
             {
                 _previousTouchPosition1 = touch1Pos;
-                BeginPan();
+                if (!Utils.IsOverUIElement())
+                    BeginPan();
             }
 
             if (Input.touchCount == 1)

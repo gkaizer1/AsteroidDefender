@@ -35,7 +35,7 @@ public class HealthBehavior : MonoBehaviour, IDamagable
             _explosionContainer = GameObject.Find("ENEMIES_CONTAINER");
         }
         Health = MaxHealth;
-        OnHealthChanged?.Invoke(Health, MaxHealth);
+        OnHealthChanged?.Invoke(Health, MaxHealth); 
     }
 
     public float Health
@@ -56,6 +56,8 @@ public class HealthBehavior : MonoBehaviour, IDamagable
             {
                 if (DestroyOnDeath)
                     Destroy(this.gameObject);
+                if(explodeOnDeathPrefab != null)
+                    Explode();
             }
         }
     }
@@ -68,6 +70,7 @@ public class HealthBehavior : MonoBehaviour, IDamagable
             explosion.name = $"explosion_{name}";
             explosion.transform.parent = this.transform.parent;
             explosion.transform.position = this.transform.position;
+            explosion.transform.rotation = this.transform.rotation;
         }
     }
 

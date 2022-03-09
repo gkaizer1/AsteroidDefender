@@ -45,13 +45,11 @@ public class RailGunFiringState : IState<RailGunBehavior>
         // No Target - disable firing state and return to idle state
         if(target == null || target != _startTarget)
         {
-            Parent.CanFire = false;
             return new RailGunRotateToTargetState(Parent);
         }
 
-
         Vector2 delta = Parent.railGunTop.transform.position - target.transform.position;
-        float reachTime = delta.magnitude / (Parent.bulletSpeed * 2.0f);
+        float reachTime = delta.magnitude / (Parent.bulletSpeed);
 
         Vector3 targetPosition = target.transform.position;
         var targetRigidBody = target.GetComponent<Rigidbody2D>();
@@ -68,6 +66,11 @@ public class RailGunFiringState : IState<RailGunBehavior>
 
         // Keep turrent pointing at target
         Parent.railGunTop.transform.rotation = Quaternion.Euler(0f, 0f, angle);
+
+        if(Parent.CanFire)
+        {
+            Parent.Fire();
+        }
 
         return this;
     }

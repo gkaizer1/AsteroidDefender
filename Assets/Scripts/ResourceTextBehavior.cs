@@ -23,11 +23,17 @@ public class ResourceTextBehavior : MonoBehaviour
 
     private void OnDestroy()
     {
+        if (ResourceManagerBehavior.Instance == null)
+            return;
+
         ResourceManagerBehavior.Instance.resource.Find(x => x.resource == resource).OnAmountChanged.RemoveListener(OnResourceAdded);
     }
 
     public void OnEnable()
     {
+        if (ResourceManagerBehavior.Instance == null)
+            return;
+
         var resourceItem = ResourceManagerBehavior.Instance.resource.Find(x => x.resource == resource);
         OnResourceAdded(resourceItem.Count, 0);
     }

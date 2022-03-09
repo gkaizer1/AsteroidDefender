@@ -1,9 +1,23 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
+#if UNITY_EDITOR
+using UnityEditor.Experimental.SceneManagement;
+using UnityEditor;
+#endif
+
+#if UNITY_EDITOR
+[ExecuteAlways]
+#endif
 public class HealthIndicatorBehavior : MonoBehaviour
 {
+    [Range(0, 100)]
+    public int lights = 3;
+    [Range(0, 1)]
+    public float spacing = 0.075f;
+    public Sprite healthLightSprite = null;
     public List<GameObject> healthLights = new List<GameObject>();
     public bool HideWhenFull = false;
 
@@ -22,80 +36,80 @@ public class HealthIndicatorBehavior : MonoBehaviour
         }
     }
 
-    public Color PrecentageColor(float precentage)
-    {
-        Color color = Color.green;
-        if (precentage > 0.80)
-        {
-            color = Color.green;
-        }
-        else if (precentage > 0.5)
-        {
-            color = Color.yellow;
-        }
-        else if (precentage > 0.1)
-        {
-            color = Color.red;
-        }
-        else
-        {
-            color = Color.red;
-        }
-        return color;
-    }
-
     public void OnHealthChanged(float current, float max)
     {
-        if(HideWhenFull && current == max)
+        if(HideWhenFull && current != max)
         {
+            HideWhenFull = false;
             foreach (var healthLight in healthLights)
             {
-                healthLight.SetActive(false);
+                healthLight.SetActive(true);
             }
-            return;
         }
 
         Color color = Color.green;
         float lifePrecentage = current / max;
         float damagePrecent = 1.0f - lifePrecentage;
-        if (lifePrecentage > 0.80)
-        {
-            color = Color.green;
-            healthLights[0].SetActive(true);
-            healthLights[0].GetComponent<SpriteRenderer>().color = Color.green;
-            healthLights[1].SetActive(true);
-            healthLights[1].GetComponent<SpriteRenderer>().color = Color.green;
-            healthLights[2].SetActive(true);
-            healthLights[2].GetComponent<SpriteRenderer>().color = PrecentageColor((lifePrecentage - 0.2f) / 0.8f);
-        }
-        else if (lifePrecentage > 0.5)
-        {
-            color = Color.yellow;
-            healthLights[0].SetActive(true);
-            healthLights[0].GetComponent<SpriteRenderer>().color = Color.green;
-            healthLights[1].SetActive(true);
-            healthLights[1].GetComponent<SpriteRenderer>().color = PrecentageColor((lifePrecentage - 0.5f) / 0.5f);
-            healthLights[2].SetActive(false);
-        }
-        else if (lifePrecentage > 0.1)
-        {
-            color = Color.red;
-            healthLights[0].SetActive(true);
-            healthLights[0].GetComponent<SpriteRenderer>().color = PrecentageColor((lifePrecentage - 0.9f) / 0.1f);
-            healthLights[1].SetActive(false);
-            healthLights[2].SetActive(false);
-        }
-        else
-        {
-            color = Color.red;
-            healthLights[0].SetActive(false);
-            healthLights[1].SetActive(false);
-            healthLights[2].SetActive(false);
-        }
 
-        foreach (var healthLight in healthLights)
+        float lifePerBlock = max / lights;
+        for (int i = 0; i < lights; i++)
         {
-            //healthLight.GetComponent<SpriteRenderer>().color = color;
+            var currentBlockSpriteRenderer = healthLights[healthLights.Count - i - 1].GetComponent<SpriteRenderer>();
+            float currentBlockMinLife = lifePerBlock * i;
+            float currentBlockMaxLife = lifePerBlock * (i + 1);
+            if (current > currentBlockMaxLife)
+            {
+                currentBlockSpriteRenderer.enabled = true;
+                healthLights[healthLights.Count - i - 1].GetComponent<SpriteRenderer>().color = Color.green;
+            }
+            else if(lifePrecentage > currentBlockMinLife)
+            {
+                currentBlockSpriteRenderer.enabled = true;
+                // How much life is left in this block
+                float precentageLeftInBlock = (current - currentBlockMinLife) / lifePerBlock;
+                if (precentageLeftInBlock > 0.9f)
+                    healthLights[healthLights.Count - i - 1].GetComponent<SpriteRenderer>().color = Color.green;
+                else if (precentageLeftInBlock > 0.4f)
+                    healthLights[healthLights.Count - i - 1].GetComponent<SpriteRenderer>().color = Color.yellow;
+                else
+                    healthLights[healthLights.Count - i - 1].GetComponent<SpriteRenderer>().color = Color.red;
+            }
+            else
+            {
+                currentBlockSpriteRenderer.enabled = false;
+            }
         }
     }
+
+#if UNITY_EDITOR
+
+    public bool _update = false;
+    public void Update()
+    {
+        if (!_update)
+            return;
+        
+        _update = false;
+        foreach (Transform light in this.transform)
+        {
+            UnityEditor.EditorApplication.delayCall += () =>
+            {
+                DestroyImmediate(light.gameObject, true);
+            };
+        }
+        
+        healthLights.Clear();
+
+        for (int i = 0; i < lights; i++)
+        {
+            GameObject go = new GameObject($"light_{i}");
+            SpriteRenderer renderer = go.AddComponent<SpriteRenderer>();
+            renderer.sprite = this.healthLightSprite;
+            renderer.color = Color.green;
+            go.transform.parent = this.gameObject.transform;
+            go.transform.localPosition = new Vector3(go.transform.position.x + ((float)i) * spacing, 0f, 0f);
+            healthLights.Add(go);
+        }
+    }
+#endif
 }

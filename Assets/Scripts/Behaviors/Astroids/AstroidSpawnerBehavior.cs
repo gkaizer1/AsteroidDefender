@@ -163,7 +163,7 @@ public class AstroidSpawnerBehavior : MonoBehaviour
         if(_worldTextInstance != null)
             _worldTextInstance.GetComponent<CanvasScreenBehavior>().Text = $"x{_enemiesToSpawn.ToString()}";
 
-        float randomRange = UnityEngine.Random.Range(0, 2);
+        float randomRange = UnityEngine.Random.Range(0, this.spawnRadius);
         float randomAngle = UnityEngine.Random.Range(0, 360);
 
         float xStartPos = this.transform.position.x + (randomRange * Mathf.Cos(randomAngle));

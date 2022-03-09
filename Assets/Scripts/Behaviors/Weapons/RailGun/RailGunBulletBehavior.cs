@@ -13,6 +13,9 @@ public class RailGunBulletBehavior : MonoBehaviour
     [SerializeField]
     private GameObject hitExplosion;
 
+    [SerializeField]
+    private GameObject hitParticleSystem;
+
     public float Speed = 15.0f;
 
     public float Damage = 75.0f;
@@ -80,6 +83,14 @@ public class RailGunBulletBehavior : MonoBehaviour
             explosion.transform.position = detonationPoint;
             explosion.name = $"explosion_{this.name}";
             explosion.transform.localScale = Vector3.one * 0.5f;
+
+            if(hitParticleSystem != null)
+            {
+                var particleSystem = GameObject.Instantiate(this.hitParticleSystem, this.transform.parent);
+                particleSystem.transform.position = this.transform.position;
+                float angle = Mathf.Atan2(this.rigidBody.velocity.y, this.rigidBody.velocity.x) * Mathf.Rad2Deg;
+                particleSystem.transform.rotation = Quaternion.Euler(0f, 0f, angle);
+            }
         }
 
         rigidBody.velocity = Vector2.zero;

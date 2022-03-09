@@ -8,46 +8,30 @@ public class UpgradePanelBehavior : MonoBehaviour
     UpgradableBehavior _currentUpgradable;
 
     [Header("Upgrade Parameters")]
-    public UpgradableBehavior.Upgrades upgrade;
-    public List<UpgradableBehavior.Upgrades> requirements = new List<UpgradableBehavior.Upgrades>();
+    public Upgrades upgrade;
+    public List<Upgrades> requirements = new List<Upgrades>();
 
     [Header("UIElements")]
     public Button button;
     public TMPro.TextMeshProUGUI indicatorText;
     public List<GameObject> objectsToToggle = new List<GameObject>();
 
-    // Start is called before the first frame update
-    void Start()
+    public void SetUpgradeableParent(UpgradableBehavior upgradeable)
     {
-        SelectionManager.OnSelectedObjectChanged += SelectionManager_OnSelectedObjectChanged;
-    }
+        _currentUpgradable = upgradeable;
 
-    private void SelectionManager_OnSelectedObjectChanged(GameObject previous, GameObject current)
-    {
-        if (!this.gameObject.activeInHierarchy)
-            return;
-
-        if(_currentUpgradable != null)
+        if (_currentUpgradable != null)
         {
             _currentUpgradable.OnUpgradeUnlocked.RemoveListener(OnUpgradeUnlocked);
         }
 
-        if (current == null)
-        {
-            return;
-        }
-
-        _currentUpgradable = current.GetComponentInChildren<UpgradableBehavior>();
-        if (_currentUpgradable == null)
-            return;
-
         _currentUpgradable.OnUpgradeUnlocked.AddListener(OnUpgradeUnlocked);
-        OnUpgradeUnlocked(UpgradableBehavior.Upgrades.UNKNOWN);
+        OnUpgradeUnlocked();
     }
 
     private void OnEnable()
     {
-        OnUpgradeUnlocked(UpgradableBehavior.Upgrades.UNKNOWN);
+        OnUpgradeUnlocked();
     }
 
     public void SetHasUpgrade(bool hasUpgrade)
@@ -77,26 +61,31 @@ public class UpgradePanelBehavior : MonoBehaviour
 
     public void ToggleUpgradeButton(bool enabled)
     {
+        // Disable resource bound button
         foreach (var obj in button.GetComponents<ResourceBoundButtonBehavior>())
             obj.enabled = enabled;
 
         button.interactable = enabled;
     }
 
-    public void OnUpgradeUnlocked(UpgradableBehavior.Upgrades upgrade)
+    public void OnUpgradeUnlocked(Upgrades upgrade = Upgrades.UNKNOWN)
     {
         if (_currentUpgradable == null)
             return;
 
         foreach(var req in requirements)
         {
-            if(!_currentUpgradable.activeUpgrades.Contains(req))
+            if (_currentUpgradable.activeUpgrades.Contains(req))
+                continue;
+            
+            if (indicatorText != null)
             {
                 indicatorText.text = "LOCKED";
                 indicatorText.color = Color.red;
-                ToggleUpgradeButton(false);
-                return;
             }
+
+            ToggleUpgradeButton(false);
+            break;            
         }
 
         bool hasUpgrade = _currentUpgradable.activeUpgrades.Contains(this.upgrade);

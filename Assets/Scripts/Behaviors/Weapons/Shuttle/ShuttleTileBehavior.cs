@@ -57,6 +57,12 @@ public class ShuttleTileBehavior : MonoBehaviour
         if (mission.MissionAccepted)
             return;
 
+        if (!_hasShuttle)
+            return;
+
+        // Accept this mission
+        mission.MissionAccepted = true;
+
         // Disconnect the shuttle from this transform
         _shuttle.transform.parent = null;
         _hasShuttle = false;

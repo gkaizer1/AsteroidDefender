@@ -80,7 +80,7 @@ public class VulcanCannonBehavior : MonoBehaviour, IStateMachine
 
     public void UpgradeSecondTurret()
     {
-        if (GetComponent<UpgradableBehavior>().activeUpgrades.Contains(UpgradableBehavior.Upgrades.VULCAN_CANNON_3))
+        if (GetComponent<UpgradableBehavior>().activeUpgrades.Contains(Upgrades.VULCAN_CANNON_3))
             return;
 
         SetBulletsPerSecond(5);
@@ -118,7 +118,7 @@ public class VulcanCannonBehavior : MonoBehaviour, IStateMachine
     void SetBulletsPerSecond(float bulletsPerSecond)
     {
         this.BulletsPerSecond = bulletsPerSecond;
-        if (GetComponent<UpgradableBehavior>().activeUpgrades.Contains(UpgradableBehavior.Upgrades.VULCAN_AMMO))
+        if (GetComponent<UpgradableBehavior>().activeUpgrades.Contains(Upgrades.VULCAN_AMMO))
             this.BulletsPerSecond *= 1.5f;
     }
 

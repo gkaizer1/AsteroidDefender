@@ -72,7 +72,7 @@ Transform:
   m_GameObject: {fileID: 7682892239699496193}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 1}
-  m_LocalScale: {x: 1.2, y: 1.2, z: 1}
+  m_LocalScale: {x: 5, y: 5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6729717280436960095}
@@ -96,7 +96,7 @@ MonoBehaviour:
   Enemies: []
   enemyContainerName: ENEMIES_CONTAINER
   initialSpawnDelay: 1
-  spawnRadius: 3
+  spawnRadius: 5
   OnLevelCompleted:
     m_PersistentCalls:
       m_Calls: []
@@ -212,10 +212,18 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 584159981786954914, guid: e4198f875b536f24cb95c6b472a0ad1b, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 584159981786954914, guid: e4198f875b536f24cb95c6b472a0ad1b, type: 3}
       propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 584159981786954914, guid: e4198f875b536f24cb95c6b472a0ad1b, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 584159981786954914, guid: e4198f875b536f24cb95c6b472a0ad1b, type: 3}
+      propertyPath: m_LocalPosition.y
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 584159981786954914, guid: e4198f875b536f24cb95c6b472a0ad1b, type: 3}
@@ -228,11 +236,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2110626814789518817, guid: e4198f875b536f24cb95c6b472a0ad1b, type: 3}
       propertyPath: m_LocalScale.x
-      value: 3
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2110626814789518817, guid: e4198f875b536f24cb95c6b472a0ad1b, type: 3}
       propertyPath: m_LocalScale.y
-      value: 3
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2110626814789518817, guid: e4198f875b536f24cb95c6b472a0ad1b, type: 3}
       propertyPath: m_LocalPosition.x
@@ -339,6 +347,10 @@ PrefabInstance:
       value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 6333798480039694717, guid: e4198f875b536f24cb95c6b472a0ad1b, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6333798480039694717, guid: e4198f875b536f24cb95c6b472a0ad1b, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: b4f5e1e1a7b848b45ba9291dc0f12d54, type: 2}
@@ -374,7 +386,9 @@ PrefabInstance:
       propertyPath: m_SortingOrder
       value: 1
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 5006130183769572264, guid: e4198f875b536f24cb95c6b472a0ad1b, type: 3}
+    - {fileID: 8641035704617087924, guid: e4198f875b536f24cb95c6b472a0ad1b, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: e4198f875b536f24cb95c6b472a0ad1b, type: 3}
 --- !u!114 &1490651429974726894 stripped
 MonoBehaviour:

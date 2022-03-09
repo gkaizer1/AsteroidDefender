@@ -10,7 +10,7 @@ public class TutorialSatelliteTargetBehavior : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision)
     {
         var gameObj = collision.gameObject;
-        if (gameObj.GetComponentInChildren<SatelliteBehavior>() == null)
+        if (gameObj.GetComponentInChildren<SatelliteBehavior>() == null && gameObj.GetComponent<SatelliteBehavior>() == null)
             return;
 
         onSatelliteEntered?.Invoke();
